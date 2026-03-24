@@ -1,0 +1,146 @@
+[
+  {
+    "id": "lora",
+    "title": "LoRA: Low-Rank Adaptation of Large Language Models",
+    "conference": "ICLR",
+    "year": 2022,
+    "status": "Reproduced",
+    "presenter": "Duc Vo",
+    "tags": ["LLM", "Fine-tuning", "Efficiency"],
+    "date_read": "2026-03-22",
+    "vibeScore": 95,
+    "resources": {
+      "arxiv": "https://arxiv.org/abs/2106.09685",
+      "github": "https://github.com/microsoft/LoRA",
+      "vjai_code": "https://github.com/vjai/lora-repro",
+      "youtube": "https://youtube.com",
+      "blog": "https://vjai.dev/blog/lora"
+    },
+    "summary": "An efficient way to fine-tune LLMs by only updating low-rank matrices, reducing trainable parameters by 10,000x with no accuracy drop.",
+    "tldr": [
+      "Freezes pre-trained weights and injects trainable rank decomposition matrices into each layer.",
+      "Reduces GPU memory requirements by >3x, enabling fine-tuning on consumer hardware.",
+      "Achieves comparable or better performance vs full fine-tuning on NLP benchmarks."
+    ]
+  },
+  {
+    "id": "qlora",
+    "title": "QLoRA: Efficient Finetuning of Quantized LLMs",
+    "conference": "NeurIPS",
+    "year": 2023,
+    "status": "Reproduced",
+    "presenter": "Minh Tran",
+    "tags": ["LLM", "Quantization", "Efficiency"],
+    "date_read": "2026-03-08",
+    "vibeScore": 92,
+    "resources": {
+      "arxiv": "https://arxiv.org/abs/2305.14314",
+      "github": "https://github.com/artidoro/qlora",
+      "vjai_code": "https://github.com/vjai/qlora-repro",
+      "youtube": "https://youtube.com",
+      "blog": "https://vjai.dev/blog/qlora"
+    },
+    "summary": "Combines 4-bit quantization with LoRA to fine-tune 65B LLMs on a single 48GB GPU.",
+    "tldr": [
+      "Introduces 4-bit NormalFloat (NF4), a new data type optimal for normally-distributed weights.",
+      "Double quantization further reduces memory by ~0.5 bits per parameter.",
+      "Guanaco models fine-tuned with QLoRA match ChatGPT on human benchmarks."
+    ]
+  },
+  {
+    "id": "mamba",
+    "title": "Mamba: Linear-Time Sequence Modeling with Selective State Spaces",
+    "conference": "ICLR",
+    "year": 2024,
+    "status": "In Review",
+    "presenter": "Lan Nguyen",
+    "tags": ["Architecture", "SSM", "Efficiency"],
+    "date_read": "2026-04-05",
+    "vibeScore": 88,
+    "resources": {
+      "arxiv": "https://arxiv.org/abs/2312.00752",
+      "github": "https://github.com/state-spaces/mamba",
+      "vjai_code": "",
+      "youtube": "https://youtube.com",
+      "blog": "https://vjai.dev/blog/mamba"
+    },
+    "summary": "A new sequence model architecture with linear time complexity that matches Transformers on language tasks.",
+    "tldr": [
+      "Selective State Space Model (SSM) that can selectively remember or forget context.",
+      "5x faster inference than Transformers of equivalent size at long sequence lengths.",
+      "Outperforms Transformers on multiple language, audio, and genomics benchmarks."
+    ]
+  },
+  {
+    "id": "rag",
+    "title": "Retrieval-Augmented Generation for Knowledge-Intensive NLP",
+    "conference": "NeurIPS",
+    "year": 2020,
+    "status": "Archived",
+    "presenter": "Thanh Nguyen",
+    "tags": ["RAG", "LLM", "Retrieval"],
+    "date_read": "2026-01-25",
+    "vibeScore": 90,
+    "resources": {
+      "arxiv": "https://arxiv.org/abs/2005.11401",
+      "github": "https://github.com/huggingface/transformers",
+      "vjai_code": "https://github.com/vjai/rag-demo",
+      "youtube": "https://youtube.com",
+      "blog": "https://vjai.dev/blog/rag"
+    },
+    "summary": "Combines parametric memory (LLM weights) with non-parametric memory (retrieval corpus) for knowledge-intensive tasks.",
+    "tldr": [
+      "Fine-tunes both the retriever and generator end-to-end for knowledge-intensive NLP.",
+      "Outperforms pure parametric models on open-domain QA with far less compute.",
+      "Enables easy knowledge updates without retraining the full model."
+    ]
+  },
+  {
+    "id": "diffusion-policy",
+    "title": "Diffusion Policy: Visuomotor Policy Learning via Action Diffusion",
+    "conference": "RSS",
+    "year": 2023,
+    "status": "Archived",
+    "presenter": "Bao Nguyen",
+    "tags": ["Robotics", "Diffusion", "RL"],
+    "date_read": "2026-03-08",
+    "vibeScore": 82,
+    "resources": {
+      "arxiv": "https://arxiv.org/abs/2303.04137",
+      "github": "https://github.com/real-stanford/diffusion_policy",
+      "vjai_code": "",
+      "youtube": "https://youtube.com",
+      "blog": "https://vjai.dev/blog/diffusion-policy"
+    },
+    "summary": "Applies diffusion probabilistic models to robot manipulation, treating action generation as denoising.",
+    "tldr": [
+      "Formulates robot policy as a conditional denoising diffusion process over actions.",
+      "Handles multimodal action distributions better than behavior cloning or IBC.",
+      "Achieves 46% improvement over best prior method on 12 robot manipulation tasks."
+    ]
+  },
+  {
+    "id": "alphafold3",
+    "title": "Accurate structure prediction of biomolecular interactions with AlphaFold 3",
+    "conference": "Nature",
+    "year": 2024,
+    "status": "Archived",
+    "presenter": "Hoa Le",
+    "tags": ["Biology", "Protein", "Diffusion"],
+    "date_read": "2026-02-22",
+    "vibeScore": 78,
+    "resources": {
+      "arxiv": "https://www.nature.com/articles/s41586-024-07487-w",
+      "github": "https://github.com/google-deepmind/alphafold3",
+      "vjai_code": "",
+      "youtube": "https://youtube.com",
+      "blog": "https://vjai.dev/blog/alphafold3"
+    },
+    "summary": "Extends AlphaFold to predict the structure of all biological molecules and their complexes using a diffusion-based model.",
+    "tldr": [
+      "Uses a diffusion module instead of structure modules to generate 3D atom coordinates.",
+      "Covers proteins, DNA, RNA, and small molecules in a single unified model.",
+      "Sets SOTA on diverse benchmarks for protein-ligand and antibody-antigen docking."
+    ]
+  }
+]

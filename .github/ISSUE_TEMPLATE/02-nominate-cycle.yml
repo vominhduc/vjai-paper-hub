@@ -1,0 +1,48 @@
+name: "🗳️ Nominate Paper for Cycle"
+description: "Nominate a paper (from Seeds or new) for the current Exploration cycle. Community votes will select the Deep Dive paper."
+title: "Nominate: [PAPER TITLE]"
+labels: ["nomination", "cycle"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Nominate a Paper for the Current Cycle
+        The paper with the most 👍 reactions on this issue will be selected for the Deep Dive session.
+
+  - type: input
+    id: arxiv_url
+    attributes:
+      label: "arXiv URL"
+      description: "Full arXiv abstract URL"
+      placeholder: "https://arxiv.org/abs/..."
+    validations:
+      required: true
+
+  - type: input
+    id: cycle_id
+    attributes:
+      label: "Cycle ID"
+      description: "Which cycle to nominate for, e.g. 2026-q2-c2"
+      placeholder: "2026-q2-c2"
+    validations:
+      required: true
+
+  - type: input
+    id: tags
+    attributes:
+      label: "Tags"
+      description: "Comma-separated tags"
+      placeholder: "LLM, Reasoning, RL"
+    validations:
+      required: true
+
+  - type: textarea
+    id: why
+    attributes:
+      label: "Why should we read this?"
+      description: "One paragraph pitch — why is this paper worth a 90-minute deep dive?"
+      placeholder: "This paper is important because..."
+    validations:
+      required: true

@@ -1,0 +1,92 @@
+[
+  {
+    "id": "2026-q2-c1",
+    "quarter": "Q2",
+    "cycle": 1,
+    "status": "deep-dive",
+    "theme": "Reasoning & Reinforcement Learning",
+    "nominations": [
+      {
+        "id": "p1",
+        "title": "DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning",
+        "proposer": "Duc Vo",
+        "arxiv": "https://arxiv.org/abs/2501.12948",
+        "tags": ["LLM", "RL", "Reasoning"],
+        "is_selected": true,
+        "votes": 18
+      },
+      {
+        "id": "p2",
+        "title": "JEPA: A World Model for Self-Supervised Learning",
+        "proposer": "Minh Tran",
+        "arxiv": "https://arxiv.org/abs/2301.08243",
+        "tags": ["World Models", "Self-Supervised"],
+        "is_selected": false,
+        "votes": 11
+      },
+      {
+        "id": "p3",
+        "title": "FlashAttention-3: Fast and Accurate Attention on H100 GPUs",
+        "proposer": "Lan Nguyen",
+        "arxiv": "https://arxiv.org/abs/2407.08608",
+        "tags": ["Systems", "Efficiency"],
+        "is_selected": false,
+        "votes": 9
+      }
+    ],
+    "session": {
+      "date": "2026-04-12",
+      "presenter": "Duc Vo",
+      "presenter_role": "ML Engineer · VJAI Core",
+      "agenda": [
+        "Paper motivation: why pure RL for LLM reasoning?",
+        "Methodology deep-dive: GRPO algorithm and reward shaping",
+        "Benchmark analysis: MATH-500, AIME, LiveCodeBench",
+        "Live demo: running DeepSeek-R1 locally with Ollama",
+        "Open Q&A and reproduction discussion"
+      ]
+    }
+  },
+  {
+    "id": "2026-q2-c2",
+    "quarter": "Q2",
+    "cycle": 2,
+    "status": "exploration",
+    "theme": "Efficient Architectures & Systems",
+    "nominations": [
+      {
+        "id": "p4",
+        "title": "Mamba-2: Transformers are SSMs",
+        "proposer": "Hoa Le",
+        "arxiv": "https://arxiv.org/abs/2405.21060",
+        "tags": ["Architecture", "SSM"],
+        "is_selected": false,
+        "votes": 14
+      },
+      {
+        "id": "p5",
+        "title": "Gemini 2.0 Technical Report",
+        "proposer": "Open Slot",
+        "arxiv": "",
+        "tags": ["Multimodal", "Foundation Models"],
+        "is_selected": false,
+        "votes": 12
+      },
+      {
+        "id": "p6",
+        "title": "Constitutional AI: Harmlessness from AI Feedback",
+        "proposer": "Thanh Nguyen",
+        "arxiv": "https://arxiv.org/abs/2212.08073",
+        "tags": ["Alignment", "RLHF"],
+        "is_selected": false,
+        "votes": 7
+      }
+    ],
+    "session": {
+      "date": "2026-04-26",
+      "presenter": "",
+      "presenter_role": "",
+      "agenda": []
+    }
+  }
+]

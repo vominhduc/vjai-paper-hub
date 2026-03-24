@@ -1,0 +1,66 @@
+name: "🌱 Add Seed Paper"
+
+# Fires when an issue is labeled with "seed" (template: 01-propose-seed.yml)
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  add-seed:
+    # Only run when the "seed" label is applied
+    if: github.event.label.name == 'seed'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write       # push data/seeds.json
+      issues: write         # post comment back to issue
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Run add-seed script
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_AUTHOR: ${{ github.event.issue.user.login }}
+        run: node scripts/add-seed.js
+
+      - name: Commit updated seeds.json
+        run: |
+          git config user.name "vjai-bot"
+          git config user.email "bot@vjai.dev"
+          git add data/seeds.json
+          git diff --staged --quiet || git commit -m "🌱 seed: add paper from issue #${{ github.event.issue.number }}"
+          git push
+
+      - name: Comment on Issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const seeds = JSON.parse(fs.readFileSync('data/seeds.json', 'utf8'));
+            const newest = seeds[seeds.length - 1];
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `## ✅ Seed Paper Added!\n\n**${newest.title}**\n\n| Field | Value |\n|---|---|\n| ID | \`${newest.id}\` |\n| Domain | ${newest.domain} |\n| Hackability | ${newest.hackabilityScore}% |\n| arXiv | ${newest.arxiv} |\n\nThis paper is now live on the [Seeds page](https://vjai.github.io/paper-hub/seeds). To claim it for an implementation sprint, use the **Claim** button on the site or comment \`/claim\` below.`
+            });
+
+      - name: Trigger site rebuild
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'deploy.yml',
+              ref: 'main'
+            });

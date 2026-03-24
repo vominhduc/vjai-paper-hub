@@ -1,0 +1,76 @@
+name: "🌱 Propose Seed Paper"
+description: "Propose a new paper for the curated seed pool. A bot will auto-fetch metadata from arXiv."
+title: "Propose: [PAPER TITLE]"
+labels: ["proposal", "seed"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Propose a Seed Paper
+        Fill in the arXiv URL — the bot will automatically fetch title, authors, abstract, and year.
+        You only need to fill in the qualitative fields below.
+
+  - type: input
+    id: arxiv_url
+    attributes:
+      label: "arXiv URL"
+      description: "Full arXiv abstract URL, e.g. https://arxiv.org/abs/2501.12948"
+      placeholder: "https://arxiv.org/abs/..."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: domain
+    attributes:
+      label: "Domain"
+      description: "Primary research domain"
+      options:
+        - LLM
+        - Vision
+        - Multimodal
+        - Systems
+        - RL
+        - Robotics
+        - Biology
+        - Architecture
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: tags
+    attributes:
+      label: "Tags"
+      description: "Comma-separated tags, e.g. LLM, Reasoning, RL"
+      placeholder: "Tag1, Tag2, Tag3"
+    validations:
+      required: true
+
+  - type: input
+    id: hackability_score
+    attributes:
+      label: "Hackability Score (0-100)"
+      description: "How easily can this be reproduced / built on? 80+ = weekend sprint; 50-79 = week project; <50 = research effort"
+      placeholder: "75"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: "One-line Description"
+      description: "A single sentence explaining why this paper is interesting and hackable"
+      placeholder: "Trains LLMs to reason purely via RL, achieving o1-level performance with no SFT."
+    validations:
+      required: true
+
+  - type: input
+    id: conference
+    attributes:
+      label: "Conference / Venue"
+      description: "e.g. NeurIPS, ICLR, CVPR, Preprint"
+      placeholder: "Preprint"
+    validations:
+      required: true

@@ -1,0 +1,135 @@
+name: "✅ Complete Session → Archive"
+description: "Mark a session as complete and move the paper to the Archive. Fill in the presenter details and session resources."
+title: "Complete: [PAPER TITLE]"
+labels: ["completed", "archive"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Archive a Completed Session
+        Fill this form after a session is done. The bot will move the paper from `cycles.json` to `archive.json`
+        and update the roadmap status automatically.
+
+  - type: input
+    id: arxiv_url
+    attributes:
+      label: "arXiv URL"
+      description: "Full arXiv abstract URL of the paper that was discussed"
+      placeholder: "https://arxiv.org/abs/..."
+    validations:
+      required: true
+
+  - type: input
+    id: cycle_id
+    attributes:
+      label: "Cycle ID"
+      description: "Which cycle this session was part of, e.g. 2026-q2-c1"
+      placeholder: "2026-q2-c1"
+    validations:
+      required: true
+
+  - type: input
+    id: presenter
+    attributes:
+      label: "Presenter Name"
+      placeholder: "Duc Vo"
+    validations:
+      required: true
+
+  - type: input
+    id: presenter_role
+    attributes:
+      label: "Presenter Role"
+      placeholder: "ML Engineer · VJAI Core"
+    validations:
+      required: true
+
+  - type: input
+    id: date_read
+    attributes:
+      label: "Session Date (YYYY-MM-DD)"
+      placeholder: "2026-04-12"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: session_status
+    attributes:
+      label: "Reproduction Status"
+      options:
+        - "Reproduced"
+        - "In Review"
+        - "Archived"
+    validations:
+      required: true
+
+  - type: input
+    id: vibe_score
+    attributes:
+      label: "Vibe Score (0-100)"
+      description: "Community rating — how mind-blowing was this paper?"
+      placeholder: "90"
+    validations:
+      required: true
+
+  - type: input
+    id: youtube_url
+    attributes:
+      label: "YouTube Recording URL (optional)"
+      placeholder: "https://youtube.com/watch?v=..."
+
+  - type: input
+    id: github_url
+    attributes:
+      label: "Paper's Official GitHub (optional)"
+      placeholder: "https://github.com/..."
+
+  - type: input
+    id: vjai_code_url
+    attributes:
+      label: "VJAI Reproduction Repo URL (optional)"
+      placeholder: "https://github.com/vjai/..."
+
+  - type: input
+    id: blog_url
+    attributes:
+      label: "Blog Post URL (optional)"
+      placeholder: "https://vjai.dev/blog/..."
+
+  - type: textarea
+    id: tldr
+    attributes:
+      label: "TL;DR Bullets (3 lines)"
+      description: "Three key takeaways, one per line"
+      placeholder: |
+        Freezes pre-trained weights and injects trainable low-rank matrices.
+        Reduces GPU memory by 3x, enabling fine-tuning on consumer hardware.
+        Matches full fine-tuning performance on NLP benchmarks.
+    validations:
+      required: true
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: "One-sentence Summary"
+      placeholder: "An efficient way to fine-tune LLMs by only updating low-rank matrices."
+    validations:
+      required: true
+
+  - type: input
+    id: conference
+    attributes:
+      label: "Conference / Venue"
+      placeholder: "NeurIPS"
+    validations:
+      required: true
+
+  - type: input
+    id: tags
+    attributes:
+      label: "Tags (comma-separated)"
+      placeholder: "LLM, Fine-tuning, Efficiency"
+    validations:
+      required: true

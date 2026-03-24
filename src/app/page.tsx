@@ -1,65 +1,597 @@
-import Image from "next/image";
+import Link from "next/link";
+import {
+  ArrowRight,
+  BookOpen,
+  Users,
+  GitFork,
+  Zap,
+  TrendingUp,
+  Calendar,
+  ChevronRight,
+  Star,
+} from "lucide-react";
+import { getDeepDiveCycle, archive } from "@/lib/data";
+import Countdown from "@/components/Countdown";
 
-export default function Home() {
+/* ─── Static data for contributions feed ─────────────────── */
+const latestContributions = [
+  {
+    type: "summary",
+    label: "Technical Summary",
+    title: "LoRA reproduction notes + Vietnamese benchmark",
+    author: "Duc Vo",
+    date: "Mar 22",
+    icon: "📝",
+    href: "#",
+  },
+  {
+    type: "video",
+    label: "Recording",
+    title: "QLoRA deep-dive — full session recording",
+    author: "VJAI Team",
+    date: "Mar 8",
+    icon: "🎥",
+    href: "#",
+  },
+  {
+    type: "code",
+    label: "OSS Repo",
+    title: "vjai/lora-repro — LLaMA-2 + LoRA on Bactrian-X",
+    author: "Minh Tran",
+    date: "Mar 22",
+    icon: "⚙️",
+    href: "https://github.com/vjai/lora-repro",
+  },
+  {
+    type: "summary",
+    label: "Blog Post",
+    title: "Mamba vs Transformer: practical performance guide",
+    author: "Lan Nguyen",
+    date: "Apr 5",
+    icon: "✍️",
+    href: "#",
+  },
+];
+
+const globalStats = [
+  { icon: BookOpen, value: "24", label: "Papers Digested", color: "#FF5722" },
+  { icon: Users, value: "120+", label: "Active Members", color: "#42A5F5" },
+  { icon: GitFork, value: "8", label: "OSS Repos", color: "#4CAF50" },
+  { icon: Zap, value: "Bi-weekly", label: "Cadence", color: "#FF5722" },
+];
+
+function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <div className="flex items-center gap-3 mb-4">
+      <div className="h-px w-8" style={{ background: "rgba(255,87,34,0.5)" }} />
+      <span className="text-xs font-bold tracking-[0.2em] uppercase" style={{ color: "#FF5722" }}>
+        {children}
+      </span>
+    </div>
+  );
+}
+
+/* ─── Page ────────────────────────────────────────────────── */
+export default function Home() {
+  const cycle = getDeepDiveCycle();
+  const selected = cycle?.nominations.find((n) => n.is_selected);
+  const recentPapers = archive.slice(0, 3);
+
+  return (
+    <div
+      className="flex flex-col"
+      style={{
+        background: "linear-gradient(160deg, #070c26 0%, #0e1550 50%, #070c26 100%)",
+        color: "#e8eaf6",
+      }}
+    >
+      {/* ══ HERO ══════════════════════════════════════════════ */}
+      <section className="relative min-h-screen flex items-center overflow-hidden pt-16">
+        <div className="absolute inset-0 grid-bg opacity-50" />
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              "radial-gradient(ellipse 80% 60% at 50% 30%, rgba(26,35,126,0.5) 0%, transparent 70%)",
+          }}
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+        <div
+          className="absolute top-24 right-8 w-96 h-96 rounded-full pointer-events-none"
+          style={{
+            background: "radial-gradient(circle, rgba(255,87,34,0.1) 0%, transparent 70%)",
+            filter: "blur(60px)",
+          }}
+        />
+
+        <div className="relative max-w-7xl mx-auto px-6 py-24 w-full">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            {/* ── Left: copy ── */}
+            <div>
+              <div
+                className="inline-flex items-center gap-2 mb-6 px-4 py-1.5 rounded-full text-xs font-semibold"
+                style={{
+                  background: "rgba(255,87,34,0.1)",
+                  border: "1px solid rgba(255,87,34,0.35)",
+                  color: "#FF7043",
+                }}
+              >
+                <span className="relative flex h-2 w-2">
+                  <span
+                    className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
+                    style={{ background: "#FF5722" }}
+                  />
+                  <span
+                    className="relative inline-flex rounded-full h-2 w-2"
+                    style={{ background: "#FF5722" }}
+                  />
+                </span>
+                2026 Season Active · Vietnam–Japan AI
+              </div>
+
+              <h1
+                className="text-5xl lg:text-6xl font-black leading-[1.1] mb-6 tracking-tight"
+                style={{ fontFamily: "var(--font-geist-sans)" }}
+              >
+                <span className="gradient-text">VJAI</span>{" "}
+                <span className="text-white">Paper</span>
+                <br />
+                <span className="text-white">Reading</span>{" "}
+                <span style={{ color: "#FF5722" }}>Hub.</span>
+              </h1>
+
+              <p
+                className="text-lg mb-10 max-w-lg leading-relaxed"
+                style={{ color: "rgba(232,234,246,0.65)" }}
+              >
+                Bridging the gap between academic SOTA and hackathon-ready MVPs.
+                Bi-weekly deep-dives for AI engineers and researchers in Japan &amp; Vietnam.
+              </p>
+
+              <div className="flex flex-wrap gap-4 mb-12">
+                <a
+                  href="#featured"
+                  className="btn-orange inline-flex items-center gap-2 text-white font-bold px-7 py-3.5 rounded-full text-sm"
+                >
+                  View This Cycle <ArrowRight size={14} />
+                </a>
+                <Link
+                  href="/roadmap"
+                  className="btn-ghost inline-flex items-center gap-2 font-semibold px-7 py-3.5 rounded-full text-sm text-white"
+                >
+                  2026 Roadmap <ChevronRight size={14} />
+                </Link>
+              </div>
+
+              {/* Stat row */}
+              <div className="flex flex-wrap gap-8">
+                {globalStats.map((s) => (
+                  <div key={s.label} className="flex items-center gap-2.5">
+                    <s.icon size={16} style={{ color: s.color }} />
+                    <div>
+                      <div className="text-lg font-black leading-none" style={{ color: s.color }}>
+                        {s.value}
+                      </div>
+                      <div
+                        className="text-xs mt-0.5"
+                        style={{ color: "rgba(232,234,246,0.45)" }}
+                      >
+                        {s.label}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* ── Right: Spotlight + Countdown ── */}
+            <div className="float-anim flex flex-col gap-4">
+              {/* Countdown */}
+              {cycle?.session.date && (
+                <div className="glass-card rounded-2xl p-5">
+                  <p className="text-xs font-semibold mb-4 text-center uppercase tracking-widest"
+                    style={{ color: "rgba(232,234,246,0.4)" }}>
+                    <Calendar size={11} className="inline mr-1.5" />
+                    Next Session · {cycle.session.date}
+                  </p>
+                  <Countdown targetDate={cycle.session.date} />
+                </div>
+              )}
+
+              {/* Featured paper spotlight */}
+              {selected && (
+                <div
+                  className="glass-card rounded-2xl p-7 relative overflow-hidden"
+                  style={{ border: "1px solid rgba(255,87,34,0.25)" }}
+                >
+                  <div
+                    className="absolute -top-8 -right-8 w-36 h-36 rounded-full pointer-events-none"
+                    style={{
+                      background: "radial-gradient(circle, rgba(255,87,34,0.15) 0%, transparent 70%)",
+                    }}
+                  />
+
+                  <div className="flex items-start justify-between mb-4">
+                    <div>
+                      <p className="text-xs mb-2" style={{ color: "rgba(232,234,246,0.4)" }}>
+                        {cycle?.id?.toUpperCase()} · Selected Paper
+                      </p>
+                      <div className="flex gap-2">
+                        {selected.tags.slice(0, 2).map((t) => (
+                          <span key={t} className="paper-tag text-xs font-bold px-2.5 py-0.5 rounded-full">
+                            {t}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    <span
+                      className="text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1"
+                      style={{
+                        background: "rgba(255,87,34,0.15)",
+                        color: "#FF5722",
+                        border: "1px solid rgba(255,87,34,0.4)",
+                      }}
+                    >
+                      <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
+                      Deep Dive
+                    </span>
+                  </div>
+
+                  <h2 className="text-lg font-bold text-white leading-snug mb-2">
+                    {selected.title}
+                  </h2>
+
+                  <p className="text-xs mb-4" style={{ color: "#FF7043" }}>
+                    Presenter: {cycle?.session.presenter} · {cycle?.session.presenter_role}
+                  </p>
+
+                  <div className="glow-line mb-4" />
+
+                  {/* Agenda preview */}
+                  <ul className="flex flex-col gap-2 mb-5">
+                    {cycle?.session.agenda.slice(0, 3).map((item, i) => (
+                      <li key={i} className="flex gap-2 text-xs" style={{ color: "rgba(232,234,246,0.6)" }}>
+                        <span className="font-bold shrink-0" style={{ color: "#FF5722" }}>
+                          0{i + 1}
+                        </span>
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+
+                  <div className="flex gap-3">
+                    {selected.arxiv && (
+                      <a
+                        href={selected.arxiv}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn-orange flex-1 text-center text-white font-bold text-sm py-2.5 rounded-xl"
+                      >
+                        Read Paper
+                      </a>
+                    )}
+                    <Link
+                      href="/cycle"
+                      className="btn-ghost flex-1 text-center text-white font-semibold text-sm py-2.5 rounded-xl"
+                    >
+                      Full Agenda
+                    </Link>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+      </section>
+
+      {/* ══ STATS BAR ════════════════════════════════════════ */}
+      <section
+        style={{
+          background: "rgba(7,12,38,0.8)",
+          borderTop: "1px solid rgba(255,255,255,0.06)",
+          borderBottom: "1px solid rgba(255,255,255,0.06)",
+        }}
+      >
+        <div className="max-w-7xl mx-auto px-6 py-8 grid grid-cols-2 md:grid-cols-4 gap-5">
+          {globalStats.map((s) => (
+            <div key={s.label} className="stat-card glass-card rounded-xl p-5 flex items-center gap-4">
+              <div
+                className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                style={{ background: `${s.color}18` }}
+              >
+                <s.icon size={18} style={{ color: s.color }} />
+              </div>
+              <div>
+                <div className="text-2xl font-black leading-none" style={{ color: s.color }}>
+                  {s.value}
+                </div>
+                <div className="text-xs mt-1" style={{ color: "rgba(232,234,246,0.45)" }}>
+                  {s.label}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ══ KEY INSIGHTS (featured paper bullet points) ══════ */}
+      {selected && (
+        <section id="featured" className="py-20">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="grid lg:grid-cols-2 gap-12 items-start">
+              <div>
+                <SectionLabel>Current Deep Dive</SectionLabel>
+                <h2 className="text-3xl font-black text-white mb-4 leading-tight">
+                  {selected.title}
+                </h2>
+                <p className="text-base mb-8" style={{ color: "rgba(232,234,246,0.6)" }}>
+                  Key technical insights your team will walk away with after this session.
+                </p>
+
+                <div className="flex flex-col gap-4">
+                  {[
+                    "How pure RL (GRPO) produces emergent chain-of-thought reasoning with zero SFT warm-up",
+                    "Why the reward function design (format + accuracy) is the critical hyperparameter",
+                    "Benchmark-level comparison vs OpenAI o1 on MATH-500, AIME 2024, and LiveCodeBench",
+                    "Practical guide: running DeepSeek-R1-7B locally with Ollama on your laptop",
+                  ].map((insight, i) => (
+                    <div
+                      key={i}
+                      className="flex gap-4 p-4 rounded-xl glow-border-hover"
+                      style={{
+                        background: "rgba(255,255,255,0.03)",
+                        border: "1px solid rgba(255,255,255,0.07)",
+                      }}
+                    >
+                      <div
+                        className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-black shrink-0"
+                        style={{ background: "rgba(255,87,34,0.15)", color: "#FF5722" }}
+                      >
+                        {i + 1}
+                      </div>
+                      <p className="text-sm leading-relaxed" style={{ color: "rgba(232,234,246,0.75)" }}>
+                        {insight}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Session full agenda */}
+              <div
+                className="glass-card rounded-2xl p-7"
+                style={{ border: "1px solid rgba(255,255,255,0.09)" }}
+              >
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-base font-bold text-white">Session Agenda</h3>
+                  <span className="text-xs" style={{ color: "rgba(232,234,246,0.4)" }}>
+                    {cycle?.session.date}
+                  </span>
+                </div>
+
+                <div className="flex flex-col gap-3 mb-6">
+                  {cycle?.session.agenda.map((item, i) => (
+                    <div key={i} className="flex gap-3 items-start">
+                      <div
+                        className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5"
+                        style={{ background: "rgba(255,87,34,0.2)", color: "#FF5722" }}
+                      >
+                        {i + 1}
+                      </div>
+                      <span className="text-sm" style={{ color: "rgba(232,234,246,0.7)" }}>
+                        {item}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="glow-line mb-6" />
+
+                <div className="flex items-center gap-3 mb-6">
+                  <div
+                    className="w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm"
+                    style={{ background: "linear-gradient(135deg, #1A237E, #FF5722)", color: "white" }}
+                  >
+                    {cycle?.session.presenter.charAt(0)}
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-white">{cycle?.session.presenter}</p>
+                    <p className="text-xs" style={{ color: "rgba(232,234,246,0.45)" }}>
+                      {cycle?.session.presenter_role}
+                    </p>
+                  </div>
+                </div>
+
+                <a
+                  href="#"
+                  className="btn-orange w-full text-center text-white font-bold text-sm py-3 rounded-xl block"
+                >
+                  Register for Session →
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ══ LATEST CONTRIBUTIONS ═════════════════════════════ */}
+      <section
+        className="py-20"
+        style={{ background: "rgba(7,12,38,0.5)" }}
+      >
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex items-end justify-between mb-10">
+            <div>
+              <SectionLabel>Community Output</SectionLabel>
+              <h2 className="text-3xl font-black text-white">Latest Contributions</h2>
+            </div>
+            <Link
+              href="/archive"
+              className="text-sm font-semibold flex items-center gap-1.5"
+              style={{ color: "#FF5722" }}
+            >
+              Full Archive <ArrowRight size={13} />
+            </Link>
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+            {latestContributions.map((c, i) => (
+              <a
+                key={i}
+                href={c.href}
+                target={c.href.startsWith("http") ? "_blank" : undefined}
+                rel="noopener noreferrer"
+                className="stat-card glass-card glow-border-hover rounded-xl p-5 flex flex-col gap-3"
+              >
+                <div className="flex items-center justify-between">
+                  <span
+                    className="text-xs font-bold px-2.5 py-0.5 rounded-full paper-tag"
+                  >
+                    {c.label}
+                  </span>
+                  <span className="text-xs" style={{ color: "rgba(232,234,246,0.35)" }}>
+                    {c.date}
+                  </span>
+                </div>
+                <div className="text-2xl">{c.icon}</div>
+                <p className="text-sm font-semibold text-white leading-snug flex-1">{c.title}</p>
+                <p className="text-xs" style={{ color: "rgba(232,234,246,0.45)" }}>
+                  by {c.author}
+                </p>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ══ RECENT PAPERS ════════════════════════════════════ */}
+      <section className="py-20">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex items-end justify-between mb-10">
+            <div>
+              <SectionLabel>Knowledge Hub</SectionLabel>
+              <h2 className="text-3xl font-black text-white">Recent Papers</h2>
+            </div>
+            <Link
+              href="/archive"
+              className="text-sm font-semibold flex items-center gap-1.5"
+              style={{ color: "#FF5722" }}
+            >
+              All {archive.length} papers <ArrowRight size={13} />
+            </Link>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-5 mb-10">
+            {recentPapers.map((paper) => (
+              <div
+                key={paper.id}
+                className="stat-card glass-card glow-border-hover rounded-2xl p-6 flex flex-col gap-3"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex gap-1.5 flex-wrap">
+                    {paper.tags.slice(0, 2).map((t) => (
+                      <span key={t} className="paper-tag text-xs px-2.5 py-0.5 rounded-full font-semibold">
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                  <span className="text-xs font-mono" style={{ color: "rgba(232,234,246,0.3)" }}>
+                    {paper.conference}
+                  </span>
+                </div>
+                <p className="text-sm font-bold text-white leading-snug flex-1">{paper.title}</p>
+                <div className="flex items-center gap-2">
+                  <div
+                    className="flex-1 h-1 rounded-full overflow-hidden"
+                    style={{ background: "rgba(255,255,255,0.07)" }}
+                  >
+                    <div
+                      className="h-full rounded-full"
+                      style={{
+                        width: `${paper.vibeScore}%`,
+                        background: "linear-gradient(90deg, #1A237E, #FF5722)",
+                      }}
+                    />
+                  </div>
+                  <span className="text-xs font-bold shrink-0" style={{ color: "#FF5722" }}>
+                    ⚡ {paper.vibeScore}%
+                  </span>
+                </div>
+                <div className="flex gap-2">
+                  {paper.resources.arxiv && (
+                    <a
+                      href={paper.resources.arxiv}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs font-semibold flex items-center gap-1"
+                      style={{ color: "#FF5722" }}
+                    >
+                      <BookOpen size={10} /> Paper
+                    </a>
+                  )}
+                  {paper.resources.vjai_code && (
+                    <a
+                      href={paper.resources.vjai_code}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs font-semibold flex items-center gap-1 ml-2"
+                      style={{ color: "#4CAF50" }}
+                    >
+                      <GitFork size={10} /> Repo
+                    </a>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ══ CTA ══════════════════════════════════════════════ */}
+      <section
+        className="py-20"
+        style={{ background: "rgba(7,12,38,0.8)", borderTop: "1px solid rgba(255,255,255,0.05)" }}
+      >
+        <div className="max-w-3xl mx-auto px-6 text-center">
+          <div
+            className="rounded-3xl p-12 relative overflow-hidden"
+            style={{
+              background: "linear-gradient(135deg, rgba(26,35,126,0.65) 0%, rgba(255,87,34,0.12) 100%)",
+              border: "1px solid rgba(255,87,34,0.2)",
+            }}
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+            <div
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                background: "radial-gradient(ellipse 60% 60% at 50% 100%, rgba(255,87,34,0.1) 0%, transparent 70%)",
+              }}
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            <TrendingUp size={32} className="mx-auto mb-4" style={{ color: "#FF5722" }} />
+            <h2 className="text-3xl font-black text-white mb-3 relative">
+              From Paper to Prototype
+            </h2>
+            <p className="text-base mb-8 relative" style={{ color: "rgba(232,234,246,0.6)" }}>
+              Join 120+ AI engineers and researchers in Vietnam &amp; Japan building at the frontier.
+              Next session: <strong style={{ color: "#FF5722" }}>
+                {cycle?.session.date ?? "Coming Soon"}
+              </strong>.
+            </p>
+            <div className="flex flex-wrap gap-4 justify-center relative">
+              <Link
+                href="/cycle"
+                className="btn-orange text-white font-bold px-8 py-3.5 rounded-full text-sm inline-flex items-center gap-2"
+              >
+                Join This Cycle <ArrowRight size={14} />
+              </Link>
+              <Link
+                href="/seeds"
+                className="btn-ghost text-white font-semibold px-8 py-3.5 rounded-full text-sm"
+              >
+                Browse Seed Papers
+              </Link>
+            </div>
+          </div>
         </div>
-      </main>
+      </section>
     </div>
   );
 }

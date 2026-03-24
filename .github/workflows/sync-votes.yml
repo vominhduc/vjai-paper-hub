@@ -1,0 +1,50 @@
+name: "🗳️ Sync Nomination Votes"
+
+# Runs every 6 hours and on manual dispatch
+on:
+  schedule:
+    - cron: "0 */6 * * *"   # every 6 hours
+  workflow_dispatch:         # manual trigger from GitHub UI
+
+jobs:
+  sync-votes:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Sync votes from GitHub reactions
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPO: ${{ github.repository }}
+        run: node scripts/sync-votes.js
+
+      - name: Commit if votes changed
+        run: |
+          git config user.name "vjai-bot"
+          git config user.email "bot@vjai.dev"
+          git add data/cycles.json
+          git diff --staged --quiet || (git commit -m "🗳️ sync: update vote counts [skip ci]" && git push)
+
+      - name: Trigger site rebuild if data changed
+        if: ${{ steps.commit.outputs.committed == 'true' }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'deploy.yml',
+              ref: 'main'
+            });

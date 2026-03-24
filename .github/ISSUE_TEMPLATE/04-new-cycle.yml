@@ -1,0 +1,71 @@
+name: "📅 Open New Cycle"
+description: "Open a new nomination cycle for a quarter. Sets up the exploration phase."
+title: "New Cycle: [CYCLE ID]"
+labels: ["new-cycle", "cycle"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Open a New Nomination Cycle
+        This creates a new entry in `cycles.json` with `status: exploration`.
+        Share the issue link with the community to start collecting nominations.
+
+  - type: input
+    id: cycle_id
+    attributes:
+      label: "Cycle ID"
+      description: "Format: YYYY-Qn-Cn, e.g. 2026-q3-c1"
+      placeholder: "2026-q3-c1"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: quarter
+    attributes:
+      label: "Quarter"
+      options: ["Q1", "Q2", "Q3", "Q4"]
+    validations:
+      required: true
+
+  - type: input
+    id: cycle_number
+    attributes:
+      label: "Cycle Number within Quarter"
+      placeholder: "1"
+    validations:
+      required: true
+
+  - type: input
+    id: theme
+    attributes:
+      label: "Cycle Theme"
+      description: "A short thematic label, e.g. 'Reasoning & Reinforcement Learning'"
+      placeholder: "Efficient Inference & Serving"
+    validations:
+      required: true
+
+  - type: input
+    id: session_date
+    attributes:
+      label: "Planned Session Date (YYYY-MM-DD)"
+      placeholder: "2026-07-12"
+    validations:
+      required: true
+
+  - type: input
+    id: presenter
+    attributes:
+      label: "Tentative Presenter (can be TBD)"
+      placeholder: "TBD"
+    validations:
+      required: true
+
+  - type: input
+    id: presenter_role
+    attributes:
+      label: "Presenter Role"
+      placeholder: "VJAI Community"
+    validations:
+      required: true

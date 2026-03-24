@@ -1,0 +1,74 @@
+name: "✅ Complete Session → Archive"
+
+# Fires when an issue gets both "completed" and "archive" labels
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  complete-session:
+    # Only trigger on the "archive" label (the issue also needs "completed")
+    if: github.event.label.name == 'archive'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Run complete-session script
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_AUTHOR: ${{ github.event.issue.user.login }}
+        run: node scripts/complete-session.js
+
+      - name: Commit data changes
+        run: |
+          git config user.name "vjai-bot"
+          git config user.email "bot@vjai.dev"
+          git add data/archive.json data/cycles.json data/seeds.json
+          git diff --staged --quiet || git commit -m "✅ archive: complete session from issue #${{ github.event.issue.number }}"
+          git push
+
+      - name: Comment on Issue and close it
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const archive = JSON.parse(fs.readFileSync('data/archive.json', 'utf8'));
+            const newest = archive[0];
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `## ✅ Session Archived!\n\n**${newest.title}**\n\n| Field | Value |\n|---|---|\n| Presenter | ${newest.presenter} |\n| Date | ${newest.date_read} |\n| Vibe Score | ${newest.vibeScore}% |\n| Status | ${newest.status} |\n| arXiv | [Link](${newest.resources.arxiv}) |\n\nThis paper is now live in the [Archive](https://vjai.github.io/paper-hub/archive). The cycle has been marked complete.`
+            });
+
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              state: 'closed'
+            });
+
+      - name: Trigger site rebuild
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'deploy.yml',
+              ref: 'main'
+            });
