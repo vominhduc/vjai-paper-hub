@@ -13,45 +13,7 @@ import {
 import { getDeepDiveCycle, archive } from "@/lib/data";
 import Countdown from "@/components/Countdown";
 
-/* ─── Static data for contributions feed ─────────────────── */
-const latestContributions = [
-  {
-    type: "summary",
-    label: "Technical Summary",
-    title: "LoRA reproduction notes + Vietnamese benchmark",
-    author: "Duc Vo",
-    date: "Mar 22",
-    icon: "📝",
-    href: "#",
-  },
-  {
-    type: "video",
-    label: "Recording",
-    title: "QLoRA deep-dive — full session recording",
-    author: "VJAI Team",
-    date: "Mar 8",
-    icon: "🎥",
-    href: "#",
-  },
-  {
-    type: "code",
-    label: "OSS Repo",
-    title: "vjai/lora-repro — LLaMA-2 + LoRA on Bactrian-X",
-    author: "Minh Tran",
-    date: "Mar 22",
-    icon: "⚙️",
-    href: "https://github.com/vjai/lora-repro",
-  },
-  {
-    type: "summary",
-    label: "Blog Post",
-    title: "Mamba vs Transformer: practical performance guide",
-    author: "Lan Nguyen",
-    date: "Apr 5",
-    icon: "✍️",
-    href: "#",
-  },
-];
+
 
 const globalStats = [
   { icon: BookOpen, value: "24", label: "Papers Digested", color: "#FF5722" },
@@ -283,36 +245,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ══ STATS BAR ════════════════════════════════════════ */}
-      <section
-        style={{
-          background: "rgba(7,12,38,0.8)",
-          borderTop: "1px solid rgba(255,255,255,0.06)",
-          borderBottom: "1px solid rgba(255,255,255,0.06)",
-        }}
-      >
-        <div className="max-w-7xl mx-auto px-6 py-8 grid grid-cols-2 md:grid-cols-4 gap-5">
-          {globalStats.map((s) => (
-            <div key={s.label} className="stat-card glass-card rounded-xl p-5 flex items-center gap-4">
-              <div
-                className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-                style={{ background: `${s.color}18` }}
-              >
-                <s.icon size={18} style={{ color: s.color }} />
-              </div>
-              <div>
-                <div className="text-2xl font-black leading-none" style={{ color: s.color }}>
-                  {s.value}
-                </div>
-                <div className="text-xs mt-1" style={{ color: "rgba(232,234,246,0.45)" }}>
-                  {s.label}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
       {/* ══ KEY INSIGHTS (featured paper bullet points) ══════ */}
       {selected && (
         <section id="featured" className="py-20">
@@ -401,12 +333,12 @@ export default function Home() {
                   </div>
                 </div>
 
-                <a
-                  href="#"
+                <Link
+                  href="/cycle"
                   className="btn-orange w-full text-center text-white font-bold text-sm py-3 rounded-xl block"
                 >
-                  Register for Session →
-                </a>
+                  View Session Details →
+                </Link>
               </div>
             </div>
           </div>
@@ -434,30 +366,27 @@ export default function Home() {
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-            {latestContributions.map((c, i) => (
-              <a
-                key={i}
-                href={c.href}
-                target={c.href.startsWith("http") ? "_blank" : undefined}
-                rel="noopener noreferrer"
+            {recentPapers.slice(0, 4).map((paper) => (
+              <div
+                key={paper.id}
                 className="stat-card glass-card glow-border-hover rounded-xl p-5 flex flex-col gap-3"
               >
                 <div className="flex items-center justify-between">
-                  <span
-                    className="text-xs font-bold px-2.5 py-0.5 rounded-full paper-tag"
-                  >
-                    {c.label}
+                  <span className="text-xs font-bold px-2.5 py-0.5 rounded-full paper-tag">
+                    {paper.status}
                   </span>
                   <span className="text-xs" style={{ color: "rgba(232,234,246,0.35)" }}>
-                    {c.date}
+                    {paper.date_read}
                   </span>
                 </div>
-                <div className="text-2xl">{c.icon}</div>
-                <p className="text-sm font-semibold text-white leading-snug flex-1">{c.title}</p>
+                <div className="text-2xl">
+                  {paper.status === "Reproduced" ? "⚙️" : paper.status === "Reviewed" ? "📝" : "🎥"}
+                </div>
+                <p className="text-sm font-semibold text-white leading-snug flex-1">{paper.title}</p>
                 <p className="text-xs" style={{ color: "rgba(232,234,246,0.45)" }}>
-                  by {c.author}
+                  by {paper.presenter}
                 </p>
-              </a>
+              </div>
             ))}
           </div>
         </div>

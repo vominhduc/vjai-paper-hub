@@ -146,7 +146,7 @@ function SeedCard({ paper }: { paper: SeedPaper }) {
 
         {!isClaimed ? (
           <a
-            href={`https://github.com/vjai/paper-hub/issues/new?title=Claim%3A+${encodeURIComponent(paper.title)}&labels=claim&body=I+want+to+claim+this+seed+paper.`}
+            href={`https://github.com/vominhduc/vjai-paper-hub/issues/new?title=Claim%3A+${encodeURIComponent(paper.title)}&labels=claim&body=I+want+to+claim+this+seed+paper.`}
             target="_blank"
             rel="noopener noreferrer"
             className="flex-1 text-center btn-orange text-white text-xs font-bold py-2 rounded-xl flex items-center justify-center gap-1"
@@ -239,7 +239,7 @@ export default function SeedsPage() {
             </div>
 
             <a
-              href="https://github.com/vjai/paper-hub/issues/new?labels=proposal&template=propose.md&title=Propose%3A+"
+              href="https://github.com/vominhduc/vjai-paper-hub/issues/new?labels=proposal&template=01-propose-seed.yml&title=Propose%3A+"
               target="_blank"
               rel="noopener noreferrer"
               className="btn-orange text-white font-bold px-6 py-3 rounded-full text-sm inline-flex items-center gap-2 shrink-0"
@@ -401,7 +401,7 @@ export default function SeedsPage() {
             The community votes to add it to the seed pool.
           </p>
           <a
-            href="https://github.com/vjai/paper-hub/issues/new?labels=proposal&template=propose.md&title=Propose%3A+"
+            href="https://github.com/vominhduc/vjai-paper-hub/issues/new?labels=proposal&template=01-propose-seed.yml&title=Propose%3A+"
             target="_blank"
             rel="noopener noreferrer"
             className="btn-orange text-white font-bold px-8 py-3.5 rounded-full text-sm inline-flex items-center gap-2"

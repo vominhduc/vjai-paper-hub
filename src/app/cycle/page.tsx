@@ -246,7 +246,9 @@ function DeepDiveSpotlight({ cycle }: { cycle: Cycle }) {
             </a>
           )}
           <a
-            href="#"
+            href="https://github.com/vominhduc/vjai-paper-hub/issues/new?labels=nomination&template=02-nominate-cycle.yml"
+            target="_blank"
+            rel="noopener noreferrer"
             className="btn-ghost flex-1 text-center text-white font-semibold text-sm py-3 rounded-xl"
           >
             Register
@@ -509,7 +511,7 @@ export default function CyclePage() {
                   Want to nominate a paper?
                 </p>
                 <a
-                  href="https://github.com/vjai/paper-hub/issues/new?labels=nomination&template=nominate.md"
+                  href="https://github.com/vominhduc/vjai-paper-hub/issues/new?labels=nomination&template=02-nominate-cycle.yml"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn-ghost text-white font-semibold px-6 py-2.5 rounded-full text-sm inline-flex items-center gap-2"

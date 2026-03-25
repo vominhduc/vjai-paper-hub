@@ -619,7 +619,9 @@ export default function RoadmapPage() {
                               ·
                             </span>
                             <a
-                              href="#"
+                              href={item.arxiv ?? "#"}
+                              target="_blank"
+                              rel="noopener noreferrer"
                               className="text-xs font-semibold"
                               style={{ color: "#42A5F5" }}
                             >
@@ -628,12 +630,12 @@ export default function RoadmapPage() {
                           </>
                         )}
                         {isCurrent && (
-                          <a
-                            href="#"
+                          <Link
+                            href="/cycle"
                             className="btn-orange ml-auto text-white text-xs font-bold px-3 py-1.5 rounded-lg"
                           >
                             Join Session
-                          </a>
+                          </Link>
                         )}
                       </div>
                     </div>
@@ -664,7 +666,9 @@ export default function RoadmapPage() {
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <a
-              href="#"
+              href="https://github.com/vominhduc/vjai-paper-hub/issues/new?labels=nomination&template=02-nominate-cycle.yml"
+              target="_blank"
+              rel="noopener noreferrer"
               className="btn-orange text-white font-bold px-8 py-3.5 rounded-full text-sm inline-flex items-center gap-2"
             >
               Nominate a Paper

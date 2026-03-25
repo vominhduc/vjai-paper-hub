@@ -74,12 +74,12 @@ export default function Navbar() {
 
         {/* CTA */}
         <div className="hidden md:flex items-center gap-3">
-          <a
-            href="#schedule"
+          <Link
+            href="/cycle"
             className="btn-orange text-white font-semibold text-sm px-5 py-2 rounded-full"
           >
             Join Next Session
-          </a>
+          </Link>
         </div>
 
         {/* Mobile hamburger */}
@@ -129,12 +129,12 @@ export default function Navbar() {
               {link.label}
             </Link>
           ))}
-          <a
-            href="#schedule"
+          <Link
+            href="/cycle"
             className="btn-orange text-white font-semibold text-sm px-5 py-3 rounded-full text-center mt-2"
           >
             Join Next Session
-          </a>
+          </Link>
         </div>
       )}
     </header>
