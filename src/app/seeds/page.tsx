@@ -12,18 +12,60 @@ import {
   Zap,
   Plus,
 } from "lucide-react";
-import { seeds } from "@/lib/data";
+import { seeds, cycles, archive } from "@/lib/data";
 import type { SeedPaper } from "@/lib/data";
+
+/* ─── Derive paper status from live data ─────────────────── */
+type SeedStatus = "completed" | "in-cycle" | "claimed" | "open";
+
+function getSeedStatus(paper: SeedPaper): SeedStatus {
+  // Check if already read and archived (match by title substring or arxiv)
+  const inArchive = archive.some(
+    (a) =>
+      a.resources.arxiv === paper.arxiv ||
+      a.title.toLowerCase().includes(paper.title.toLowerCase().slice(0, 30))
+  );
+  if (inArchive) return "completed";
+
+  // Check if nominated in an active cycle
+  const inCycle = cycles.some((c) =>
+    c.nominations.some(
+      (n) =>
+        n.arxiv === paper.arxiv ||
+        n.title.toLowerCase().includes(paper.title.toLowerCase().slice(0, 30))
+    )
+  );
+  if (inCycle) return "in-cycle";
+
+  // Claimed but not in a cycle
+  if (paper.claimedBy !== null) return "claimed";
+
+  return "open";
+}
+
+const statusBadge: Record<
+  SeedStatus,
+  { label: string; color: string; bg: string; border: string }
+> = {
+  completed: { label: "✓ Completed", color: "#4CAF50", bg: "rgba(76,175,80,0.1)",  border: "rgba(76,175,80,0.3)"  },
+  "in-cycle": { label: "⚡ In Cycle",  color: "#FF5722", bg: "rgba(255,87,34,0.12)", border: "rgba(255,87,34,0.4)"  },
+  claimed:    { label: "🔒 Claimed",   color: "#42A5F5", bg: "rgba(66,165,245,0.1)", border: "rgba(66,165,245,0.3)" },
+  open:       { label: "Open",         color: "#42A5F5", bg: "rgba(66,165,245,0.1)", border: "rgba(66,165,245,0.2)" },
+};
 
 /* ─── Seed Card ───────────────────────────────────────────── */
 function SeedCard({ paper }: { paper: SeedPaper }) {
-  const isClaimed = paper.claimedBy !== null;
+  const status = getSeedStatus(paper);
+  const badge = statusBadge[status];
+  const isOpen = status === "open";
 
   return (
     <div
       className="glass-card glow-border-hover rounded-2xl p-6 flex flex-col gap-4 relative"
       style={{
-        border: isClaimed
+        border: status === "in-cycle"
+          ? "1px solid rgba(255,87,34,0.4)"
+          : status === "completed"
           ? "1px solid rgba(76,175,80,0.3)"
           : "1px solid rgba(255,255,255,0.07)",
       }}
@@ -51,22 +93,12 @@ function SeedCard({ paper }: { paper: SeedPaper }) {
             {paper.conference} {paper.year}
           </span>
         </div>
-        {isClaimed ? (
-          <span className="badge-claimed text-xs px-2.5 py-0.5 rounded-full shrink-0 font-bold whitespace-nowrap">
-            ✓ Claimed
-          </span>
-        ) : (
-          <span
-            className="text-xs px-2.5 py-0.5 rounded-full shrink-0 font-semibold"
-            style={{
-              background: "rgba(66,165,245,0.1)",
-              color: "#42A5F5",
-              border: "1px solid rgba(66,165,245,0.2)",
-            }}
-          >
-            Open
-          </span>
-        )}
+        <span
+          className="text-xs px-2.5 py-0.5 rounded-full shrink-0 font-bold whitespace-nowrap"
+          style={{ background: badge.bg, color: badge.color, border: `1px solid ${badge.border}` }}
+        >
+          {badge.label}
+        </span>
       </div>
 
       {/* Title */}
@@ -116,13 +148,16 @@ function SeedCard({ paper }: { paper: SeedPaper }) {
         </div>
       </div>
 
-      {/* Claimed by */}
-      {isClaimed && (
-        <p className="text-xs font-semibold" style={{ color: "#4CAF50" }}>
+      {/* Claimed by / Proposed by */}
+      {status === "in-cycle" || status === "completed" ? (
+        <p className="text-xs font-semibold" style={{ color: badge.color }}>
+          {status === "completed" ? "Presented" : "Nominated"} by {paper.claimedBy ?? paper.proposedBy}
+        </p>
+      ) : status === "claimed" ? (
+        <p className="text-xs font-semibold" style={{ color: "#42A5F5" }}>
           Claimed by {paper.claimedBy}
         </p>
-      )}
-      {!isClaimed && (
+      ) : (
         <p className="text-xs" style={{ color: "rgba(232,234,246,0.4)" }}>
           Proposed by {paper.proposedBy}
         </p>
@@ -144,7 +179,37 @@ function SeedCard({ paper }: { paper: SeedPaper }) {
           <ExternalLink size={10} /> arXiv
         </a>
 
-        {!isClaimed ? (
+        {status === "completed" ? (
+          <Link
+            href="/archive"
+            className="flex-1 text-center text-xs font-semibold py-2 rounded-xl flex items-center justify-center gap-1"
+            style={{
+              background: "rgba(76,175,80,0.1)",
+              color: "#4CAF50",
+              border: "1px solid rgba(76,175,80,0.25)",
+            }}
+          >
+            ✓ View in Archive
+          </Link>
+        ) : status === "in-cycle" ? (
+          <Link
+            href="/cycle"
+            className="flex-1 text-center btn-orange text-white text-xs font-bold py-2 rounded-xl flex items-center justify-center gap-1"
+          >
+            ⚡ In Current Cycle
+          </Link>
+        ) : status === "claimed" ? (
+          <div
+            className="flex-1 text-center text-xs font-semibold py-2 rounded-xl flex items-center justify-center gap-1"
+            style={{
+              background: "rgba(66,165,245,0.1)",
+              color: "#42A5F5",
+              border: "1px solid rgba(66,165,245,0.25)",
+            }}
+          >
+            🔒 Claimed
+          </div>
+        ) : (
           <a
             href={`https://github.com/vominhduc/vjai-paper-hub/issues/new?title=Claim%3A+${encodeURIComponent(paper.title)}&labels=claim&body=I+want+to+claim+this+seed+paper.`}
             target="_blank"
@@ -153,17 +218,6 @@ function SeedCard({ paper }: { paper: SeedPaper }) {
           >
             <GitFork size={10} /> Claim
           </a>
-        ) : (
-          <div
-            className="flex-1 text-center text-xs font-semibold py-2 rounded-xl flex items-center justify-center gap-1"
-            style={{
-              background: "rgba(76,175,80,0.1)",
-              color: "#4CAF50",
-              border: "1px solid rgba(76,175,80,0.25)",
-            }}
-          >
-            ✓ In Progress
-          </div>
         )}
       </div>
     </div>
@@ -174,7 +228,7 @@ function SeedCard({ paper }: { paper: SeedPaper }) {
 export default function SeedsPage() {
   const [query, setQuery] = useState("");
   const [domain, setDomain] = useState("all");
-  const [showClaimed, setShowClaimed] = useState<"all" | "open" | "claimed">("all");
+  const [showClaimed, setShowClaimed] = useState<"all" | "open" | "in-cycle" | "claimed" | "completed">("all");
 
   const domains = ["all", ...Array.from(new Set(seeds.map((s) => s.domain))).sort()];
 
@@ -186,10 +240,7 @@ export default function SeedsPage() {
       p.domain.toLowerCase().includes(q) ||
       p.tags.some((t) => t.toLowerCase().includes(q));
     const matchDomain = domain === "all" || p.domain === domain;
-    const matchClaim =
-      showClaimed === "all" ||
-      (showClaimed === "open" && p.claimedBy === null) ||
-      (showClaimed === "claimed" && p.claimedBy !== null);
+    const matchClaim = showClaimed === "all" || getSeedStatus(p) === showClaimed;
     return matchQuery && matchDomain && matchClaim;
   });
 
@@ -252,8 +303,9 @@ export default function SeedsPage() {
           <div className="flex flex-wrap gap-6 mt-8">
             {[
               { value: seeds.length, label: "Curated Seeds" },
-              { value: seeds.filter((s) => s.claimedBy === null).length, label: "Open to Claim" },
-              { value: seeds.filter((s) => s.claimedBy !== null).length, label: "In Progress" },
+              { value: seeds.filter((s) => getSeedStatus(s) === "open").length, label: "Open to Claim" },
+              { value: seeds.filter((s) => getSeedStatus(s) === "in-cycle").length, label: "In Active Cycle" },
+              { value: seeds.filter((s) => getSeedStatus(s) === "completed").length, label: "Completed" },
               { value: Math.round(seeds.reduce((a, s) => a + s.hackabilityScore, 0) / seeds.length), label: "Avg Hackability" },
             ].map((s) => (
               <div key={s.label}>
@@ -320,7 +372,7 @@ export default function SeedsPage() {
 
           {/* Status */}
           <div className="flex gap-1">
-            {(["all", "open", "claimed"] as const).map((v) => (
+            {(["all", "open", "in-cycle", "claimed", "completed"] as const).map((v) => (
               <button
                 key={v}
                 onClick={() => setShowClaimed(v)}
@@ -339,7 +391,7 @@ export default function SeedsPage() {
                       }
                 }
               >
-                {v}
+                {v === "in-cycle" ? "In Cycle" : v === "completed" ? "Completed" : v}
               </button>
             ))}
           </div>
