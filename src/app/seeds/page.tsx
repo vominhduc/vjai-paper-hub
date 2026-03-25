@@ -182,7 +182,7 @@ function NomCard({
           </Link>
         ) : status === "selected" ? (
           <Link
-            href="/cycle"
+            href={`/cycle#${cycleId}`}
             className="flex-1 text-center btn-orange text-white text-xs font-bold py-2 rounded-xl flex items-center justify-center gap-1"
           >
             <Zap size={10} /> View Session
@@ -198,7 +198,7 @@ function NomCard({
           </a>
         ) : (
           <Link
-            href="/cycle"
+            href={`/cycle#${cycleId}`}
             className="flex-1 text-center text-xs font-semibold py-2 rounded-xl flex items-center justify-center gap-1"
             style={{
               background: "rgba(255,255,255,0.04)",
@@ -294,7 +294,7 @@ function CycleSection({
             </a>
           )}
           <Link
-            href="/cycle"
+            href={`/cycle#${cycle.id}`}
             className="font-semibold px-5 py-2.5 rounded-full text-xs inline-flex items-center gap-1.5"
             style={{
               background: "rgba(255,255,255,0.05)",

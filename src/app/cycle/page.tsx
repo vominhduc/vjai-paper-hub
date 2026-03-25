@@ -370,7 +370,13 @@ function DeepDiveSpotlight({ cycle }: { cycle: Cycle }) {
 
 /* ─── Page ────────────────────────────────────────────────── */
 export default function CyclePage() {
-  const [activeCycleId, setActiveCycleId] = useState<string>(cycles[0]?.id ?? "");
+  const [activeCycleId, setActiveCycleId] = useState<string>(() => {
+    if (typeof window !== "undefined") {
+      const hash = window.location.hash.replace("#", "");
+      if (hash && cycles.some((c) => c.id === hash)) return hash;
+    }
+    return cycles[0]?.id ?? "";
+  });
   const cycle = cycles.find((c) => c.id === activeCycleId) ?? cycles[0];
 
   const [phase, setPhase] = useState<Phase>(
