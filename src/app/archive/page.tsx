@@ -95,8 +95,9 @@ export default function ArchivePage() {
             Paper <span className="gradient-text">Archive</span>
           </h1>
           <p className="text-base max-w-xl" style={{ color: "rgba(232,234,246,0.6)" }}>
-            Every paper we've read, reproduced, and distilled. Session notes, code, and
-            recordings all in one place.
+            Papers the group has <strong style={{ color: "#e8eaf6" }}>read, presented, and reproduced</strong> —
+            independent of the nomination cycle. Each entry includes session notes, reproduction
+            code, and a vibe score from the group.
           </p>
 
           {/* Stats */}

@@ -35,11 +35,8 @@ function getDeepDiveCycle(): Cycle | undefined {
 type NomStatus = "selected" | "nominated" | "completed";
 
 function getNomStatus(nom: Nomination): NomStatus {
-  const inArchive = archive.some(
-    (a) =>
-      (nom.arxiv && a.resources.arxiv === nom.arxiv) ||
-      a.title.toLowerCase().includes(nom.title.toLowerCase().slice(0, 30))
-  );
+  // Only match by arxiv URL — avoids false positives from fuzzy title matching
+  const inArchive = !!nom.arxiv && archive.some((a) => a.resources.arxiv === nom.arxiv);
   if (inArchive) return "completed";
   if (nom.is_selected) return "selected";
   return "nominated";

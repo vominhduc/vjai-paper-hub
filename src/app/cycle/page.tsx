@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -370,18 +370,22 @@ function DeepDiveSpotlight({ cycle }: { cycle: Cycle }) {
 
 /* ─── Page ────────────────────────────────────────────────── */
 export default function CyclePage() {
-  const [activeCycleId, setActiveCycleId] = useState<string>(() => {
-    if (typeof window !== "undefined") {
-      const hash = window.location.hash.replace("#", "");
-      if (hash && cycles.some((c) => c.id === hash)) return hash;
-    }
-    return cycles[0]?.id ?? "";
-  });
+  const [activeCycleId, setActiveCycleId] = useState<string>(cycles[0]?.id ?? "");
   const cycle = cycles.find((c) => c.id === activeCycleId) ?? cycles[0];
 
   const [phase, setPhase] = useState<Phase>(
     (cycle?.status as Phase) ?? "exploration"
   );
+
+  // On mount, read the URL hash and jump to the matching cycle + phase
+  useEffect(() => {
+    const hash = window.location.hash.replace("#", "");
+    const matched = cycles.find((c) => c.id === hash);
+    if (matched) {
+      setActiveCycleId(matched.id);
+      setPhase(matched.status as Phase);
+    }
+  }, []);
 
   const sortedNominations = [...(cycle?.nominations ?? [])].sort(
     (a, b) => b.votes - a.votes
