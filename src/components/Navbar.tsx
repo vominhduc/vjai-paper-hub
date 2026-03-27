@@ -10,6 +10,7 @@ const navLinks = [
   { label: "Cycle", href: "/cycle" },
   { label: "Seeds", href: "/seeds" },
   { label: "Archive", href: "/archive" },
+  { label: "Guide", href: "/guide" },
 ];
 
 export default function Navbar() {

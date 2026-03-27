@@ -1,5 +1,5 @@
 name: "🗳️ Nominate Paper for Cycle"
-description: "Nominate a paper (from Seeds or new) for the current Exploration cycle. Community votes will select the Deep Dive paper."
+description: "Nominate a paper you will present at the Exploration session. After all presentations, the community votes one paper into the Deep Dive."
 title: "Nominate: [PAPER TITLE]"
 labels: ["nomination", "cycle"]
 assignees: []
@@ -8,15 +8,20 @@ body:
   - type: markdown
     attributes:
       value: |
-        ## Nominate a Paper for the Current Cycle
-        The paper with the most 👍 reactions on this issue will be selected for the Deep Dive session.
+        ## Nominate a Paper for the Exploration Session
+
+        By submitting this form you are **committing to present this paper** at the upcoming Exploration session.
+        Each nominator gives a short presentation of their paper; afterwards, the community votes with 👍 reactions
+        to select one paper for the full Deep Dive session.
+
+        > 💡 **Tip:** If you arrived here from the Seeds page, the Cycle ID and arXiv URL are already pre-filled for you.
 
   - type: input
-    id: arxiv_url
+    id: nominator_name
     attributes:
-      label: "arXiv URL"
-      description: "Full arXiv abstract URL"
-      placeholder: "https://arxiv.org/abs/..."
+      label: "Your Name / Handle"
+      description: "How should we credit you as the presenter? (GitHub username, real name, or nickname)"
+      placeholder: "e.g. @alice or Alice Nguyen"
     validations:
       required: true
 
@@ -24,8 +29,17 @@ body:
     id: cycle_id
     attributes:
       label: "Cycle ID"
-      description: "Which cycle to nominate for, e.g. 2026-q2-c2"
-      placeholder: "2026-q2-c2"
+      description: "Pre-filled automatically when clicking Nominate from the website. Format: YYYY-mon"
+      placeholder: "e.g. 2026-apr"
+    validations:
+      required: true
+
+  - type: input
+    id: arxiv_url
+    attributes:
+      label: "arXiv URL"
+      description: "Full arXiv abstract URL (pre-filled when nominating a Seed paper)"
+      placeholder: "https://arxiv.org/abs/..."
     validations:
       required: true
 
@@ -33,7 +47,7 @@ body:
     id: tags
     attributes:
       label: "Tags"
-      description: "Comma-separated tags"
+      description: "Comma-separated topic tags"
       placeholder: "LLM, Reasoning, RL"
     validations:
       required: true
@@ -41,8 +55,8 @@ body:
   - type: textarea
     id: why
     attributes:
-      label: "Why should we read this?"
-      description: "One paragraph pitch — why is this paper worth a 90-minute deep dive?"
-      placeholder: "This paper is important because..."
+      label: "Why should the group explore this paper?"
+      description: "A short pitch — what makes this paper interesting enough to present at the Exploration session?"
+      placeholder: "This paper is worth exploring because..."
     validations:
       required: true

@@ -23,6 +23,17 @@ async function main() {
   const fields = parseIssueBody(issueBody);
   console.log("📋 Parsed fields:", JSON.stringify(fields, null, 2));
 
+  // Prefer the self-reported name from the form; fall back to GitHub login
+  // parseIssueBody lowercases and strips non-alphanumeric chars except spaces,
+  // so "Your Name / Handle" → "your name  handle"
+  const nominatorName = (
+    fields["your name  handle"] ||
+    fields["your name / handle"] ||
+    fields["nominator name"] ||
+    ""
+  ).trim();
+  const proposer = nominatorName || issueAuthor;
+
   const arxivUrl = fields["arxiv url"] || fields["arxiv"];
   if (!arxivUrl?.includes("arxiv")) {
     console.error("❌ No valid arXiv URL in issue body.");
@@ -52,11 +63,26 @@ async function main() {
     process.exit(1);
   }
 
-  if (cycle.status !== "exploration") {
+  // Accept nominations for active cycles that are still in the nominating phase
+  // (today <= nomination_end), OR active cycles with no dates yet (planned/just opened).
+  // Reject only if status is explicitly not "active", or if nomination window has closed.
+  if (cycle.status !== "active") {
     console.error(
-      `❌ Cycle "${cycleId}" is in "${cycle.status}" status — nominations only accepted during exploration.`
+      `❌ Cycle "${cycleId}" has status "${cycle.status}" — nominations only accepted for active cycles.`
     );
     process.exit(1);
+  }
+  if (cycle.nomination_end) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const nomEnd = new Date(cycle.nomination_end);
+    nomEnd.setHours(0, 0, 0, 0);
+    if (today > nomEnd) {
+      console.error(
+        `❌ Nominations for cycle "${cycleId}" closed on ${cycle.nomination_end}.`
+      );
+      process.exit(1);
+    }
   }
 
   // Prevent duplicates within the cycle
@@ -74,7 +100,7 @@ async function main() {
   const nomination = {
     id: nomId,
     title: meta.title,
-    proposer: issueAuthor,
+    proposer: proposer,
     arxiv: meta.arxiv_url,
     tags: tags.length ? tags : ["Uncategorized"],
     is_selected: false,
@@ -86,7 +112,7 @@ async function main() {
   fs.writeFileSync(cyclesPath, JSON.stringify(cycles, null, 2) + "\n");
   console.log(`✅ Nomination added to cycle "${cycleId}": "${meta.title}"`);
 
-  const summary = `### 🗳️ Nomination Added\n\n**${meta.title}**\n- Cycle: \`${cycleId}\`\n- Proposer: @${issueAuthor}\n- arXiv: ${meta.arxiv_url}\n\nReact with 👍 on the issue to vote!\n`;
+  const summary = `### 🗳️ Nomination Added\n\n**${meta.title}**\n- Cycle: \`${cycleId}\`\n- Proposer: ${proposer} (GitHub: @${issueAuthor})\n- arXiv: ${meta.arxiv_url}\n\nReact with 👍 on the issue to vote!\n`;
   if (process.env.GITHUB_STEP_SUMMARY) {
     fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, summary);
   }

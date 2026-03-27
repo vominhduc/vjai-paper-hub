@@ -10,16 +10,16 @@ import {
   ChevronRight,
   Star,
 } from "lucide-react";
-import { getDeepDiveCycle, archive } from "@/lib/data";
+import { cycles, archive, getCyclePhase, siteStats, cycleLabel } from "@/lib/data";
 import Countdown from "@/components/Countdown";
 
 
 
 const globalStats = [
-  { icon: BookOpen, value: "24", label: "Papers Digested", color: "#FF5722" },
-  { icon: Users, value: "120+", label: "Active Members", color: "#42A5F5" },
-  { icon: GitFork, value: "8", label: "OSS Repos", color: "#4CAF50" },
-  { icon: Zap, value: "Bi-weekly", label: "Cadence", color: "#FF5722" },
+  { icon: BookOpen, value: String(siteStats.papersDigested), label: "Papers Digested", color: "#FF5722" },
+  { icon: Users, value: String(siteStats.activeMembers), label: "Active Members", color: "#42A5F5" },
+  { icon: GitFork, value: String(siteStats.ossRepos), label: "OSS Repos", color: "#4CAF50" },
+  { icon: Zap, value: "Monthly", label: "Cadence", color: "#FF5722" },
 ];
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
@@ -35,8 +35,14 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 /* ─── Page ────────────────────────────────────────────────── */
 export default function Home() {
-  const cycle = getDeepDiveCycle();
-  const selected = cycle?.nominations.find((n) => n.is_selected);
+  const deepDiveCycle = cycles.find((c) => getCyclePhase(c) === "deep-dive");
+  const activeCycle =
+    deepDiveCycle ??
+    cycles.find((c) => getCyclePhase(c) === "voting") ??
+    cycles.find((c) => getCyclePhase(c) === "nominating") ??
+    cycles[0];
+  const phase = activeCycle ? getCyclePhase(activeCycle) : "nominating";
+  const selected = deepDiveCycle?.nominations.find((n) => n.is_selected);
   const recentPapers = archive.slice(0, 3);
 
   return (
@@ -106,7 +112,7 @@ export default function Home() {
                 style={{ color: "rgba(232,234,246,0.65)" }}
               >
                 Bridging the gap between academic SOTA and hackathon-ready MVPs.
-                Bi-weekly deep-dives for AI engineers and researchers in Japan &amp; Vietnam.
+                Monthly deep-dives for AI engineers and researchers in Japan &amp; Vietnam.
               </p>
 
               <div className="flex flex-wrap gap-4 mb-12">
@@ -147,20 +153,20 @@ export default function Home() {
 
             {/* ── Right: Spotlight + Countdown ── */}
             <div className="float-anim flex flex-col gap-4">
-              {/* Countdown */}
-              {cycle?.session.date && (
+              {/* Countdown — always shown when there's a session date */}
+              {activeCycle?.session.date && (
                 <div className="glass-card rounded-2xl p-5">
                   <p className="text-xs font-semibold mb-4 text-center uppercase tracking-widest"
                     style={{ color: "rgba(232,234,246,0.4)" }}>
                     <Calendar size={11} className="inline mr-1.5" />
-                    Next Session · {cycle.session.date}
+                    Next Session · {activeCycle.session.date}
                   </p>
-                  <Countdown targetDate={cycle.session.date} />
+                  <Countdown targetDate={activeCycle.session.date} />
                 </div>
               )}
 
-              {/* Featured paper spotlight */}
-              {selected && (
+              {/* Deep-dive: selected paper spotlight */}
+              {phase === "deep-dive" && selected && (
                 <div
                   className="glass-card rounded-2xl p-7 relative overflow-hidden"
                   style={{ border: "1px solid rgba(255,87,34,0.25)" }}
@@ -171,11 +177,10 @@ export default function Home() {
                       background: "radial-gradient(circle, rgba(255,87,34,0.15) 0%, transparent 70%)",
                     }}
                   />
-
                   <div className="flex items-start justify-between mb-4">
                     <div>
                       <p className="text-xs mb-2" style={{ color: "rgba(232,234,246,0.4)" }}>
-                        {cycle?.id?.toUpperCase()} · Selected Paper
+                        {activeCycle?.id?.toUpperCase()} · Selected Paper
                       </p>
                       <div className="flex gap-2">
                         {selected.tags.slice(0, 2).map((t) => (
@@ -197,20 +202,15 @@ export default function Home() {
                       Deep Dive
                     </span>
                   </div>
-
                   <h2 className="text-lg font-bold text-white leading-snug mb-2">
                     {selected.title}
                   </h2>
-
                   <p className="text-xs mb-4" style={{ color: "#FF7043" }}>
-                    Presenter: {cycle?.session.presenter} · {cycle?.session.presenter_role}
+                    Presenter: {activeCycle?.session.presenter} · {activeCycle?.session.presenter_role}
                   </p>
-
                   <div className="glow-line mb-4" />
-
-                  {/* Agenda preview */}
                   <ul className="flex flex-col gap-2 mb-5">
-                    {cycle?.session.agenda.slice(0, 3).map((item, i) => (
+                    {activeCycle?.session.agenda.slice(0, 3).map((item: string, i: number) => (
                       <li key={i} className="flex gap-2 text-xs" style={{ color: "rgba(232,234,246,0.6)" }}>
                         <span className="font-bold shrink-0" style={{ color: "#FF5722" }}>
                           0{i + 1}
@@ -219,25 +219,72 @@ export default function Home() {
                       </li>
                     ))}
                   </ul>
-
                   <div className="flex gap-3">
                     {selected.arxiv && (
-                      <a
-                        href={selected.arxiv}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="btn-orange flex-1 text-center text-white font-bold text-sm py-2.5 rounded-xl"
-                      >
+                      <a href={selected.arxiv} target="_blank" rel="noopener noreferrer"
+                        className="btn-orange flex-1 text-center text-white font-bold text-sm py-2.5 rounded-xl">
                         Read Paper
                       </a>
                     )}
-                    <Link
-                      href="/cycle"
-                      className="btn-ghost flex-1 text-center text-white font-semibold text-sm py-2.5 rounded-xl"
-                    >
+                    <Link href="/cycle"
+                      className="btn-ghost flex-1 text-center text-white font-semibold text-sm py-2.5 rounded-xl">
                       Full Agenda
                     </Link>
                   </div>
+                </div>
+              )}
+
+              {/* Nominating / Voting: show current nominations */}
+              {(phase === "nominating" || phase === "voting") && activeCycle && (
+                <div
+                  className="glass-card rounded-2xl p-7 relative overflow-hidden"
+                  style={{ border: "1px solid rgba(66,165,245,0.2)" }}
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <div>
+                      <p className="text-xs mb-1" style={{ color: "rgba(232,234,246,0.4)" }}>
+                        {cycleLabel(activeCycle)}
+                      </p>
+                    </div>
+
+                    <span
+                      className="text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shrink-0"
+                      style={{
+                        background: phase === "voting" ? "rgba(255,152,0,0.12)" : "rgba(66,165,245,0.1)",
+                        color: phase === "voting" ? "#FF9800" : "#42A5F5",
+                        border: `1px solid ${phase === "voting" ? "rgba(255,152,0,0.3)" : "rgba(66,165,245,0.25)"}`,
+                      }}
+                    >
+                      <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
+                      {phase === "voting" ? "Voting Open" : "Nominations Open"}
+                    </span>
+                  </div>
+
+                  <div className="glow-line mb-4" />
+
+                  <div className="flex flex-col gap-3 mb-5">
+                    {[...activeCycle.nominations]
+                      .sort((a, b) => b.votes - a.votes)
+                      .slice(0, 3)
+                      .map((nom, i) => (
+                        <div key={nom.id} className="flex items-start gap-3">
+                          <span
+                            className="text-xs font-black w-5 shrink-0 mt-0.5"
+                            style={{ color: i === 0 ? "#FF5722" : "rgba(232,234,246,0.3)" }}
+                          >
+                            #{i + 1}
+                          </span>
+                          <p className="text-xs text-white leading-snug flex-1 line-clamp-2">
+                            {nom.title}
+                          </p>
+                        </div>
+                      ))}
+                  </div>
+
+                  <Link href="/cycle"
+                    className="btn-ghost w-full text-center text-white font-semibold text-sm py-2.5 rounded-xl block">
+                    {phase === "voting" ? "Vote Now →" : "View & Nominate →"}
+                  </Link>
                 </div>
               )}
             </div>
@@ -260,12 +307,12 @@ export default function Home() {
                 </p>
 
                 <div className="flex flex-col gap-4">
-                  {[
+                  {(activeCycle?.session.agenda ?? [
                     "How pure RL (GRPO) produces emergent chain-of-thought reasoning with zero SFT warm-up",
                     "Why the reward function design (format + accuracy) is the critical hyperparameter",
                     "Benchmark-level comparison vs OpenAI o1 on MATH-500, AIME 2024, and LiveCodeBench",
                     "Practical guide: running DeepSeek-R1-7B locally with Ollama on your laptop",
-                  ].map((insight, i) => (
+                  ]).slice(0, 4).map((insight, i) => (
                     <div
                       key={i}
                       className="flex gap-4 p-4 rounded-xl glow-border-hover"
@@ -296,12 +343,12 @@ export default function Home() {
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-base font-bold text-white">Session Agenda</h3>
                   <span className="text-xs" style={{ color: "rgba(232,234,246,0.4)" }}>
-                    {cycle?.session.date}
+                    {activeCycle?.session.date}
                   </span>
                 </div>
 
                 <div className="flex flex-col gap-3 mb-6">
-                  {cycle?.session.agenda.map((item, i) => (
+                  {activeCycle?.session.agenda.map((item, i) => (
                     <div key={i} className="flex gap-3 items-start">
                       <div
                         className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5"
@@ -323,12 +370,12 @@ export default function Home() {
                     className="w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm"
                     style={{ background: "linear-gradient(135deg, #1A237E, #FF5722)", color: "white" }}
                   >
-                    {cycle?.session.presenter.charAt(0)}
+                    {activeCycle?.session.presenter.charAt(0)}
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-white">{cycle?.session.presenter}</p>
+                    <p className="text-sm font-semibold text-white">{activeCycle?.session.presenter}</p>
                     <p className="text-xs" style={{ color: "rgba(232,234,246,0.45)" }}>
-                      {cycle?.session.presenter_role}
+                      {activeCycle?.session.presenter_role}
                     </p>
                   </div>
                 </div>
@@ -501,7 +548,7 @@ export default function Home() {
             <p className="text-base mb-8 relative" style={{ color: "rgba(232,234,246,0.6)" }}>
               Join 120+ AI engineers and researchers in Vietnam &amp; Japan building at the frontier.
               Next session: <strong style={{ color: "#FF5722" }}>
-                {cycle?.session.date ?? "Coming Soon"}
+                {activeCycle?.session.date ?? "Coming Soon"}
               </strong>.
             </p>
             <div className="flex flex-wrap gap-4 justify-center relative">
@@ -516,6 +563,12 @@ export default function Home() {
                 className="btn-ghost text-white font-semibold px-8 py-3.5 rounded-full text-sm"
               >
                 Browse Seed Papers
+              </Link>
+              <Link
+                href="/guide"
+                className="btn-ghost text-white font-semibold px-8 py-3.5 rounded-full text-sm"
+              >
+                How it Works
               </Link>
             </div>
           </div>

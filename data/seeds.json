@@ -8,7 +8,7 @@
     "tags": ["LLM", "RL", "Reasoning"],
     "arxiv": "https://arxiv.org/abs/2501.12948",
     "proposedBy": "VJAI Core Team",
-    "claimedBy": null,
+    "claimedBy": "Duc Vo",
     "hackabilityScore": 88,
     "description": "Trains LLMs to reason purely via RL without SFT cold start, achieving o1-level performance."
   },
@@ -21,7 +21,7 @@
     "tags": ["World Models", "Self-Supervised", "Vision"],
     "arxiv": "https://arxiv.org/abs/2301.08243",
     "proposedBy": "VJAI Core Team",
-    "claimedBy": null,
+    "claimedBy": "Minh Tran",
     "hackabilityScore": 75,
     "description": "LeCun's proposed architecture for world models that reasons in abstract representation space."
   },
@@ -34,7 +34,7 @@
     "tags": ["Systems", "Efficiency", "Hardware"],
     "arxiv": "https://arxiv.org/abs/2407.08608",
     "proposedBy": "VJAI Core Team",
-    "claimedBy": null,
+    "claimedBy": "Lan Nguyen",
     "hackabilityScore": 70,
     "description": "Leverages H100 hardware features (TMA, WGMMA) to push attention throughput to near-theoretical limits."
   },
@@ -47,7 +47,7 @@
     "tags": ["Scaling", "LLM", "Foundations"],
     "arxiv": "https://arxiv.org/abs/2001.08361",
     "proposedBy": "VJAI Core Team",
-    "claimedBy": "Team Hanoi",
+    "claimedBy": null,
     "hackabilityScore": 60,
     "description": "Empirical laws relating model performance to compute, data, and parameters — the blueprint for GPT-4."
   },
@@ -112,7 +112,7 @@
     "tags": ["Agents", "LLM", "Embodied AI"],
     "arxiv": "https://arxiv.org/abs/2305.16291",
     "proposedBy": "VJAI Core Team",
-    "claimedBy": "Team Saigon",
+    "claimedBy": "Bao Nguyen",
     "hackabilityScore": 93,
     "description": "Lifelong learning agent in Minecraft that writes its own code to solve tasks, building a skill library over time."
   },
@@ -125,7 +125,7 @@
     "tags": ["Agents", "LLM", "Tool Use"],
     "arxiv": "https://arxiv.org/abs/2302.04761",
     "proposedBy": "VJAI Core Team",
-    "claimedBy": null,
+    "claimedBy": "Thanh Nguyen",
     "hackabilityScore": 89,
     "description": "Self-supervised method to teach LLMs when and how to call external APIs (calculator, search, calendar)."
   },
@@ -154,5 +154,83 @@
     "claimedBy": null,
     "hackabilityScore": 80,
     "description": "InstructGPT — the paper that made GPT-3 follow instructions by fine-tuning with PPO on human preferences."
+  },
+  {
+    "id": "s013",
+    "title": "LLaMA 3: Open Foundation and Fine-Tuned Chat Models",
+    "conference": "Preprint",
+    "year": 2024,
+    "domain": "LLM",
+    "tags": ["LLM", "Open Source", "Pretraining"],
+    "arxiv": "https://arxiv.org/abs/2407.21783",
+    "proposedBy": "VJAI Core Team",
+    "claimedBy": null,
+    "hackabilityScore": 85,
+    "description": "Meta's fully open LLaMA 3 family — from 8B to 405B, with details on pretraining data, architecture, and alignment."
+  },
+  {
+    "id": "s014",
+    "title": "Gemini 1.5: Unlocking Multimodal Understanding Across Millions of Tokens",
+    "conference": "Preprint",
+    "year": 2024,
+    "domain": "LLM",
+    "tags": ["LLM", "Multimodal", "Long Context"],
+    "arxiv": "https://arxiv.org/abs/2403.05530",
+    "proposedBy": "VJAI Core Team",
+    "claimedBy": null,
+    "hackabilityScore": 62,
+    "description": "Google's Gemini 1.5 with a 1M token context window — how mixture-of-experts enables efficient long-context processing."
+  },
+  {
+    "id": "s015",
+    "title": "Mixture of Experts: Switch Transformer",
+    "conference": "JMLR",
+    "year": 2022,
+    "domain": "Architecture",
+    "tags": ["MoE", "Scaling", "Efficiency"],
+    "arxiv": "https://arxiv.org/abs/2101.03961",
+    "proposedBy": "VJAI Core Team",
+    "claimedBy": null,
+    "hackabilityScore": 74,
+    "description": "Scales language models to trillion parameters with sparse Mixture-of-Experts, replacing dense FFN layers."
+  },
+  {
+    "id": "s016",
+    "title": "Stable Diffusion: High-Resolution Image Synthesis with Latent Diffusion",
+    "conference": "CVPR",
+    "year": 2022,
+    "domain": "Generative",
+    "tags": ["Diffusion", "Image Generation", "Generative Models"],
+    "arxiv": "https://arxiv.org/abs/2112.10752",
+    "proposedBy": "VJAI Core Team",
+    "claimedBy": null,
+    "hackabilityScore": 95,
+    "description": "Moves diffusion process into a compressed latent space, enabling high-quality image synthesis on consumer hardware."
+  },
+  {
+    "id": "s017",
+    "title": "CLIP: Learning Transferable Visual Models From Natural Language Supervision",
+    "conference": "ICML",
+    "year": 2021,
+    "domain": "Multimodal",
+    "tags": ["Multimodal", "Vision", "Contrastive Learning"],
+    "arxiv": "https://arxiv.org/abs/2103.00020",
+    "proposedBy": "Team Hanoi",
+    "claimedBy": null,
+    "hackabilityScore": 90,
+    "description": "Learns image-text representations from 400M pairs — zero-shot image classification rival to supervised baselines."
+  },
+  {
+    "id": "s018",
+    "title": "Graph Neural Networks: A Review of Methods and Applications",
+    "conference": "AI Open",
+    "year": 2020,
+    "domain": "Graph ML",
+    "tags": ["GNN", "Graph", "Survey"],
+    "arxiv": "https://arxiv.org/abs/1812.08434",
+    "proposedBy": "Team Saigon",
+    "claimedBy": null,
+    "hackabilityScore": 55,
+    "description": "Comprehensive survey of GNN methods — message passing, pooling, and applications in chemistry, social networks, and NLP."
   }
 ]

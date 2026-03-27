@@ -1,21 +1,74 @@
 [
   {
-    "id": "2026-q2-c1",
-    "quarter": "Q2",
-    "cycle": 1,
-    "status": "deep-dive",
-    "theme": "Reasoning & Reinforcement Learning",
+    "id": "2026-mar",
+    "month": "March",
+    "year": 2026,
+    "theme": "Foundations & Classic Papers",
+    "status": "active",
+    "nomination_end": "2026-02-28",
+    "exploration_start": "2026-03-01",
+    "session_date": "2026-03-15",
+    "nominations": [
+      {
+        "id": "p1",
+        "title": "Attention Is All You Need",
+        "proposer": "Duc Vo",
+        "arxiv": "https://arxiv.org/abs/1706.03762",
+        "tags": ["Transformers", "NLP", "Foundations"],
+        "is_selected": true,
+        "votes": 22,
+        "issue_number": 10
+      },
+      {
+        "id": "p2",
+        "title": "BERT: Pre-training of Deep Bidirectional Transformers",
+        "proposer": "Lan Nguyen",
+        "arxiv": "https://arxiv.org/abs/1810.04805",
+        "tags": ["LLM", "Pretraining", "NLP"],
+        "is_selected": false,
+        "votes": 14,
+        "issue_number": 11
+      },
+      {
+        "id": "p3",
+        "title": "GPT-3: Language Models are Few-Shot Learners",
+        "proposer": "Minh Tran",
+        "arxiv": "https://arxiv.org/abs/2005.14165",
+        "tags": ["LLM", "Few-Shot", "Scaling"],
+        "is_selected": false,
+        "votes": 8,
+        "issue_number": 12
+      }
+    ],
+    "session": {
+      "date": "2026-03-15",
+      "presenter": "Duc Vo",
+      "presenter_role": "ML Engineer · VJAI Core",
+      "agenda": [
+        "Why self-attention replaced RNNs — intuition and motivation",
+        "Multi-head attention and positional encoding deep-dive",
+        "Training the original Transformer from scratch (live coding)",
+        "Benchmarks: WMT En-De translation results walkthrough",
+        "Discussion: what would we change today?"
+      ]
+    }
+  },
+  {
+    "id": "2026-apr",
+    "month": "April",
+    "year": 2026,
+    "theme": "ICLR 2025 Highlights",
+    "status": "active",
+    "nomination_end": "2026-03-26",
+    "exploration_start": "2026-03-27",
+    "session_date": "2026-04-12",
     "nominations": [
       {
         "id": "p1",
         "title": "DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning",
         "proposer": "Duc Vo",
         "arxiv": "https://arxiv.org/abs/2501.12948",
-        "tags": [
-          "LLM",
-          "RL",
-          "Reasoning"
-        ],
+        "tags": ["LLM", "RL", "Reasoning"],
         "is_selected": true,
         "votes": 18
       },
@@ -24,10 +77,7 @@
         "title": "JEPA: A World Model for Self-Supervised Learning",
         "proposer": "Minh Tran",
         "arxiv": "https://arxiv.org/abs/2301.08243",
-        "tags": [
-          "World Models",
-          "Self-Supervised"
-        ],
+        "tags": ["World Models", "Self-Supervised"],
         "is_selected": false,
         "votes": 11
       },
@@ -36,10 +86,7 @@
         "title": "FlashAttention-3: Fast and Accurate Attention on H100 GPUs",
         "proposer": "Lan Nguyen",
         "arxiv": "https://arxiv.org/abs/2407.08608",
-        "tags": [
-          "Systems",
-          "Efficiency"
-        ],
+        "tags": ["Systems", "Efficiency"],
         "is_selected": false,
         "votes": 9
       }
@@ -58,54 +105,95 @@
     }
   },
   {
-    "id": "2026-q2-c2",
-    "quarter": "Q2",
-    "cycle": 2,
-    "status": "exploration",
-    "theme": "Efficient Architectures & Systems",
+    "id": "2026-may",
+    "month": "May",
+    "year": 2026,
+    "theme": "Agents & Tool Use",
+    "status": "active",
+    "nomination_end": "2026-04-29",
+    "exploration_start": "2026-04-30",
+    "session_date": "2026-05-17",
     "nominations": [
       {
-        "id": "p4",
-        "title": "Mamba-2: Transformers are SSMs",
-        "proposer": "Hoa Le",
-        "arxiv": "https://arxiv.org/abs/2405.21060",
-        "tags": [
-          "Architecture",
-          "SSM"
-        ],
-        "is_selected": true,
-        "votes": 14
-      },
-      {
-        "id": "p5",
-        "title": "Gemini 2.0 Technical Report",
-        "proposer": "Open Slot",
-        "arxiv": "",
-        "tags": [
-          "Multimodal",
-          "Foundation Models"
-        ],
-        "is_selected": false,
-        "votes": 12
-      },
-      {
-        "id": "p6",
-        "title": "Constitutional AI: Harmlessness from AI Feedback",
+        "id": "p1",
+        "title": "Toolformer: Language Models That Can Use Tools",
         "proposer": "Thanh Nguyen",
-        "arxiv": "https://arxiv.org/abs/2212.08073",
-        "tags": [
-          "Alignment",
-          "RLHF"
-        ],
+        "arxiv": "https://arxiv.org/abs/2302.04761",
+        "tags": ["Agents", "LLM", "Tool Use"],
         "is_selected": false,
-        "votes": 7
+        "votes": 0,
+        "issue_number": 4
+      },
+      {
+        "id": "p2",
+        "title": "Voyager: An Open-Ended Embodied Agent with LLMs",
+        "proposer": "Bao Nguyen",
+        "arxiv": "https://arxiv.org/abs/2305.16291",
+        "tags": ["Agents", "LLM", "Embodied AI"],
+        "is_selected": false,
+        "votes": 0,
+        "issue_number": 5
       }
     ],
     "session": {
-      "date": "2026-04-26",
-      "presenter": "",
+      "date": "2026-05-17",
+      "presenter": "TBA",
       "presenter_role": "",
       "agenda": []
     }
+  },
+  {
+    "id": "2026-jun",
+    "month": "June",
+    "year": 2026,
+    "theme": "CVPR, ACL, ICML",
+    "status": "planned",
+    "nominations": [],
+    "session": { "date": "", "presenter": "", "presenter_role": "", "agenda": [] }
+  },
+  {
+    "id": "2026-jul",
+    "month": "July",
+    "year": 2026,
+    "theme": "CVPR, ACL, ICML",
+    "status": "planned",
+    "nominations": [],
+    "session": { "date": "", "presenter": "", "presenter_role": "", "agenda": [] }
+  },
+  {
+    "id": "2026-aug",
+    "month": "August",
+    "year": 2026,
+    "theme": "CVPR, ACL, ICML",
+    "status": "planned",
+    "nominations": [],
+    "session": { "date": "", "presenter": "", "presenter_role": "", "agenda": [] }
+  },
+  {
+    "id": "2026-oct",
+    "month": "October",
+    "year": 2026,
+    "theme": "EMNLP, NeurIPS",
+    "status": "planned",
+    "nominations": [],
+    "session": { "date": "", "presenter": "", "presenter_role": "", "agenda": [] }
+  },
+  {
+    "id": "2026-nov",
+    "month": "November",
+    "year": 2026,
+    "theme": "EMNLP, NeurIPS",
+    "status": "planned",
+    "nominations": [],
+    "session": { "date": "", "presenter": "", "presenter_role": "", "agenda": [] }
+  },
+  {
+    "id": "2026-dec",
+    "month": "December",
+    "year": 2026,
+    "theme": "EMNLP, NeurIPS",
+    "status": "planned",
+    "nominations": [],
+    "session": { "date": "", "presenter": "", "presenter_role": "", "agenda": [] }
   }
 ]

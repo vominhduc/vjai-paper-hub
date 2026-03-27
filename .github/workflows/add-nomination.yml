@@ -55,7 +55,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body: `## 🗳️ Nomination Registered!\n\nThis paper has been added to the active cycle. **React with 👍 on this issue to vote for it!**\n\nVotes are synced every 6 hours. The paper with the most 👍 reactions will be selected for the Deep Dive session.`
+              body: `## 🗳️ Nomination Registered!\n\nThis paper has been added to the **Exploration session** for the current cycle.\n\n**What happens next:**\n1. � The nominator presents this paper at the Exploration session\n2. 👍 After all presentations, the community votes — react with 👍 on this issue to vote for Deep Dive\n3. ⚡ The paper with the most 👍 reactions is selected for the full Deep Dive session\n\nVotes are synced every 6 hours.`
             });
 
       - name: Trigger site rebuild

@@ -142,5 +142,77 @@
       "Covers proteins, DNA, RNA, and small molecules in a single unified model.",
       "Sets SOTA on diverse benchmarks for protein-ligand and antibody-antigen docking."
     ]
+  },
+  {
+    "id": "attention",
+    "title": "Attention Is All You Need",
+    "conference": "NeurIPS",
+    "year": 2017,
+    "status": "Reproduced",
+    "presenter": "Duc Vo",
+    "tags": ["Transformers", "NLP", "Foundations"],
+    "date_read": "2026-03-15",
+    "vibeScore": 99,
+    "resources": {
+      "arxiv": "https://arxiv.org/abs/1706.03762",
+      "github": "https://github.com/jadore801120/attention-is-all-you-need-pytorch",
+      "vjai_code": "https://github.com/vjai/transformer-repro",
+      "youtube": "https://youtube.com",
+      "blog": "https://vjai.dev/blog/transformer"
+    },
+    "summary": "The original Transformer paper — replaced RNNs entirely with self-attention, enabling massive parallelization and becoming the backbone of every modern LLM.",
+    "tldr": [
+      "Introduces multi-head self-attention to replace recurrence for sequence-to-sequence tasks.",
+      "Positional encodings allow the model to reason about sequence order without RNN loops.",
+      "Trains 3x faster than RNN seq2seq and sets new BLEU SOTA on WMT English-German."
+    ]
+  },
+  {
+    "id": "clip",
+    "title": "Learning Transferable Visual Models From Natural Language Supervision (CLIP)",
+    "conference": "ICML",
+    "year": 2021,
+    "status": "Reproduced",
+    "presenter": "Minh Tran",
+    "tags": ["Multimodal", "Vision", "Contrastive Learning"],
+    "date_read": "2026-02-08",
+    "vibeScore": 94,
+    "resources": {
+      "arxiv": "https://arxiv.org/abs/2103.00020",
+      "github": "https://github.com/openai/CLIP",
+      "vjai_code": "https://github.com/vjai/clip-repro",
+      "youtube": "https://youtube.com",
+      "blog": "https://vjai.dev/blog/clip"
+    },
+    "summary": "Trains image and text encoders jointly via contrastive learning on 400M image-text pairs from the internet, enabling zero-shot image classification.",
+    "tldr": [
+      "Contrastive loss pulls matching image-text pairs together and pushes non-matching pairs apart.",
+      "Zero-shot transfer: describe a class in text and classify images without any fine-tuning.",
+      "Matches ResNet-50 supervised accuracy on ImageNet with no labeled training data."
+    ]
+  },
+  {
+    "id": "stable-diffusion",
+    "title": "High-Resolution Image Synthesis with Latent Diffusion Models",
+    "conference": "CVPR",
+    "year": 2022,
+    "status": "In Review",
+    "presenter": "Lan Nguyen",
+    "tags": ["Diffusion", "Image Generation", "Generative Models"],
+    "date_read": "2026-01-11",
+    "vibeScore": 97,
+    "resources": {
+      "arxiv": "https://arxiv.org/abs/2112.10752",
+      "github": "https://github.com/CompVis/stable-diffusion",
+      "vjai_code": "",
+      "youtube": "https://youtube.com",
+      "blog": "https://vjai.dev/blog/stable-diffusion"
+    },
+    "summary": "Runs the diffusion process in a compressed latent space (not pixel space), cutting compute by 4-8x while keeping image quality — the foundation of Stable Diffusion.",
+    "tldr": [
+      "Encodes images into 4x compressed latent space with a VQ-regularized autoencoder.",
+      "Diffusion happens in latent space, reducing compute vs pixel-space diffusion by 4-8x.",
+      "Cross-attention conditioning enables flexible text, image, and semantic map control."
+    ]
   }
 ]

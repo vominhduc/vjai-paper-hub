@@ -1,0 +1,77 @@
+[
+  {
+    "id": "2026-apr",
+    "month": "April",
+    "year": 2026,
+    "theme": "ICLR Papers",
+    "status": "active",
+    "nomination_end": "2026-03-29",
+    "exploration_start": "2026-03-30",
+    "session_date": "2026-04-12",
+    "nominations": [
+      {
+        "id": "p1",
+        "title": "DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning",
+        "proposer": "Duc Vo",
+        "arxiv": "https://arxiv.org/abs/2501.12948",
+        "tags": ["LLM", "RL", "Reasoning"],
+        "is_selected": true,
+        "votes": 18
+      },
+      {
+        "id": "p2",
+        "title": "JEPA: A World Model for Self-Supervised Learning",
+        "proposer": "Minh Tran",
+        "arxiv": "https://arxiv.org/abs/2301.08243",
+        "tags": ["World Models", "Self-Supervised"],
+        "is_selected": false,
+        "votes": 11
+      }
+    ],
+    "session": {
+      "date": "2026-04-12",
+      "presenter": "Duc Vo",
+      "presenter_role": "ML Engineer · VJAI Core",
+      "agenda": [
+        "Paper motivation: why pure RL for LLM reasoning?",
+        "Methodology deep-dive: GRPO algorithm and reward shaping",
+        "Benchmark analysis: MATH-500, AIME, LiveCodeBench",
+        "Live demo: running DeepSeek-R1 locally with Ollama",
+        "Open Q&A and reproduction discussion"
+      ]
+    }
+  },
+  {
+    "id": "2026-may",
+    "month": "May",
+    "year": 2026,
+    "theme": "CVPR Papers",
+    "status": "planned",
+    "nomination_end": "2026-04-29",
+    "exploration_start": "2026-04-30",
+    "session_date": "2026-05-17",
+    "nominations": [
+      {
+        "id": "p3",
+        "title": "FlashAttention-3: Fast and Accurate Attention on H100 GPUs",
+        "proposer": "Lan Nguyen",
+        "arxiv": "https://arxiv.org/abs/2407.08608",
+        "tags": ["Systems", "Efficiency"],
+        "is_selected": false,
+        "votes": 9
+      }
+    ],
+    "session": {
+      "date": "2026-05-17",
+      "presenter": "Lan Nguyen",
+      "presenter_role": "Research Scientist · VJAI Core",
+      "agenda": [
+        "Paper overview and motivation",
+        "Technical deep-dive: FlashAttention-3 kernel",
+        "Performance benchmarks on H100 GPUs",
+        "Practical tips for integration",
+        "Q&A and open discussion"
+      ]
+    }
+  }
+]
