@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
@@ -518,7 +518,7 @@ function NominatingBanner({ cycle }: { cycle: Cycle }) {
 }
 
 /* ─── Page ────────────────────────────────────────────────── */
-export default function CyclePage() {
+function CyclePageInner() {
   const searchParams = useSearchParams();
 
   // Default to the active/nominating cycle, then voting, then first
@@ -760,5 +760,13 @@ export default function CyclePage() {
         </div>
       </section>
     </div>
+  );
+}
+
+export default function CyclePage() {
+  return (
+    <Suspense>
+      <CyclePageInner />
+    </Suspense>
   );
 }
