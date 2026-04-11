@@ -1,0 +1,73 @@
+name: "⚙️ Manage Cycle"
+description: "Change status, edit theme/dates, or delete a planned cycle."
+labels: ["manage-cycle", "admin"]
+body:
+  - type: input
+    id: cycle_id
+    attributes:
+      label: Cycle ID
+      description: "The exact cycle ID (e.g. `2026-jun`). Find it on the Roadmap page."
+      placeholder: "2026-jun"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: action
+    attributes:
+      label: Action
+      description: "What do you want to do with this cycle?"
+      options:
+        - "status — change the cycle status"
+        - "edit — update theme / month / year"
+        - "delete — remove a planned cycle with no nominations"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: new_status
+    attributes:
+      label: "New Status (for status action)"
+      description: "Leave as 'no change' if using edit or delete action."
+      options:
+        - "no change"
+        - "planned"
+        - "active"
+        - "archived"
+    validations:
+      required: false
+
+  - type: input
+    id: new_theme
+    attributes:
+      label: "New Theme (for edit action)"
+      description: "New theme text. Leave blank to keep existing."
+      placeholder: "e.g. Efficient Training & LoRA Methods"
+    validations:
+      required: false
+
+  - type: input
+    id: new_month
+    attributes:
+      label: "New Month (for edit action)"
+      description: "Full month name. Leave blank to keep existing."
+      placeholder: "e.g. September"
+    validations:
+      required: false
+
+  - type: input
+    id: new_year
+    attributes:
+      label: "New Year (for edit action)"
+      description: "Four-digit year. Leave blank to keep existing."
+      placeholder: "e.g. 2026"
+    validations:
+      required: false
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes (optional)
+      description: "Reason for the change — shown in the bot's commit message."
+      placeholder: "e.g. Rescheduling to accommodate conference overlap."
+    validations:
+      required: false

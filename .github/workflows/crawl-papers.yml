@@ -1,0 +1,94 @@
+name: "🤖 Crawl Conference Papers"
+
+on:
+  workflow_dispatch:
+    inputs:
+      conference:
+        description: "Conference name (ICLR | NeurIPS | ICML | CVPR | EMNLP | ACL | ECCV | ICCV | NAACL)"
+        required: true
+        default: "ICLR"
+        type: choice
+        options:
+          - ICLR
+          - NeurIPS
+          - ICML
+          - CVPR
+          - EMNLP
+          - ACL
+          - ECCV
+          - ICCV
+          - NAACL
+      year:
+        description: "Conference year (e.g. 2025)"
+        required: true
+        default: "2025"
+        type: string
+      limit:
+        description: "Max number of papers to add (default 20)"
+        required: false
+        default: "20"
+        type: string
+      min_citations:
+        description: "Minimum citation count to include a paper (default 50)"
+        required: false
+        default: "50"
+        type: string
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Run crawl-papers script
+        id: crawl
+        env:
+          CONFERENCE:    ${{ github.event.inputs.conference }}
+          YEAR:          ${{ github.event.inputs.year }}
+          LIMIT:         ${{ github.event.inputs.limit }}
+          MIN_CITATIONS: ${{ github.event.inputs.min_citations }}
+        run: node scripts/crawl-papers.js
+
+      - name: Commit updated seeds.json
+        run: |
+          git config user.name "vjai-bot"
+          git config user.email "bot@vjai.dev"
+          git add data/seeds.json
+          git diff --staged --quiet && echo "⚠️  No new papers to commit." || {
+            CONF="${{ github.event.inputs.conference }}"
+            YEAR="${{ github.event.inputs.year }}"
+            COUNT="${{ steps.crawl.outputs.count }}"
+            git commit -m "🤖 seeds: crawl ${CONF} ${YEAR} — ${COUNT} new papers"
+            git push
+          }
+
+      - name: Trigger site rebuild
+        if: steps.crawl.outputs.count != '0'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: "deploy.yml",
+              ref: "main"
+            });
+
+      - name: Print summary
+        run: |
+          echo "## 🤖 Crawl results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Conference:** ${{ github.event.inputs.conference }} ${{ github.event.inputs.year }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Papers added:** ${{ steps.crawl.outputs.count }}" >> $GITHUB_STEP_SUMMARY

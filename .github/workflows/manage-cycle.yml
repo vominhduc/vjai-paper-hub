@@ -1,0 +1,71 @@
+name: "⚙️ Manage Cycle"
+
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  manage-cycle:
+    if: github.event.label.name == 'manage-cycle'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      actions: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Run manage-cycle script
+        id: run
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: node scripts/manage-cycle.js
+
+      - name: Commit updated cycles.json
+        run: |
+          git config user.name "vjai-bot"
+          git config user.email "bot@vjai.dev"
+          git add data/cycles.json
+          git diff --staged --quiet || git commit -m "⚙️ cycle: manage cycle from issue #${{ github.event.issue.number }}"
+          git push
+
+      - name: Comment and close issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const summary = process.env.SUMMARY || "Cycle updated successfully.";
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: summary + "\n\n---\n_Automated by vjai-bot · Site will redeploy in ~2 min_"
+            });
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              state: "closed"
+            });
+        env:
+          SUMMARY: ${{ steps.run.outputs.summary }}
+
+      - name: Trigger site rebuild
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: "deploy.yml",
+              ref: "main"
+            });
