@@ -1,24 +1,16 @@
 #!/usr/bin/env node
 // scripts/crawl-papers.js
 // Triggered by: GitHub Actions workflow_dispatch
-// Fetches highly-cited papers from a conference/venue via Semantic Scholar API,
-// deduplicates against existing seeds.json, and appends new entries.
+//
+// Two modes:
+//   MODE=conference  — fetch highly-cited papers from a conference venue (post-proceedings)
+//   MODE=topic       — search arXiv/Semantic Scholar by keyword (pre-conference or any time)
+//
+// Target: papers are added as organizer suggestions (nominations) to a specific CYCLE_ID,
+// OR appended to seeds.json when no CYCLE_ID is provided.
 
 const fs   = require("fs");
 const path = require("path");
-
-// Semantic Scholar venue aliases (API "venue" or "externalIds.venue" values)
-const VENUE_MAP = {
-  "ICLR":    { name: "ICLR",    fields: "iclr" },
-  "NeurIPS": { name: "NeurIPS", fields: "neurips" },
-  "ICML":    { name: "ICML",    fields: "icml" },
-  "CVPR":    { name: "CVPR",    fields: "cvpr" },
-  "EMNLP":   { name: "EMNLP",   fields: "emnlp" },
-  "ACL":     { name: "ACL",     fields: "acl" },
-  "NAACL":   { name: "NAACL",   fields: "naacl" },
-  "ECCV":    { name: "ECCV",    fields: "eccv" },
-  "ICCV":    { name: "ICCV",    fields: "iccv" },
-};
 
 const API_BASE = "https://api.semanticscholar.org/graph/v1";
 const FIELDS   = "paperId,title,abstract,year,citationCount,venue,authors,externalIds,fieldsOfStudy,openAccessPdf";
@@ -105,29 +97,71 @@ async function fetchWithRetry(url, opts = {}, retries = 3) {
 }
 
 async function main() {
+  const mode       = (process.env.MODE || "conference").toLowerCase().trim(); // "conference" | "topic"
+  const cycleId    = (process.env.CYCLE_ID || "").trim();
   const conference = (process.env.CONFERENCE || "").toUpperCase().trim();
   const year       = parseInt(process.env.YEAR || String(new Date().getFullYear()), 10);
-  const limit      = parseInt(process.env.LIMIT || "20", 10);
-  const minCites   = parseInt(process.env.MIN_CITATIONS || "50", 10);
+  const topic      = (process.env.TOPIC || "").trim();        // free-text keyword (topic mode)
+  const limit      = parseInt(process.env.LIMIT || "15", 10);
+  const minCites   = parseInt(process.env.MIN_CITATIONS || "0", 10); // topic mode default: no floor
 
-  if (!conference) { console.error("❌ CONFERENCE env var required (e.g. ICLR, NeurIPS, CVPR)"); process.exit(1); }
+  if (mode !== "conference" && mode !== "topic") {
+    console.error(`❌ MODE must be "conference" or "topic" (got "${mode}")`);
+    process.exit(1);
+  }
+  if (mode === "conference" && !conference) {
+    console.error("❌ CONFERENCE env var required in conference mode (e.g. ICLR, NeurIPS, CVPR)");
+    process.exit(1);
+  }
+  if (mode === "topic" && !topic) {
+    console.error("❌ TOPIC env var required in topic mode (e.g. 'reasoning LLM', 'diffusion models')");
+    process.exit(1);
+  }
 
-  console.log(`🔍 Crawling ${conference} ${year} — top ${limit} papers (min ${minCites} citations)`);
+  // ── Load cycles.json ──────────────────────────────────────────
+  const cyclesPath = path.resolve(__dirname, "../data/cycles.json");
+  const cycles = JSON.parse(fs.readFileSync(cyclesPath, "utf8"));
+
+  let targetCycle = null;
+  if (cycleId) {
+    targetCycle = cycles.find((c) => c.id === cycleId);
+    if (!targetCycle) {
+      console.error(`❌ Cycle "${cycleId}" not found in cycles.json`);
+      process.exit(1);
+    }
+    console.log(`🎯 Target cycle: ${cycleId} — "${targetCycle.theme}"`);
+  }
+
+  // ── Build search query ────────────────────────────────────────
+  let searchQuery, logLabel;
+  if (mode === "conference") {
+    searchQuery = `${conference} ${year}`;
+    logLabel    = `${conference} ${year}`;
+    console.log(`🔍 [conference mode] Crawling ${logLabel} — top ${limit} papers (min ${minCites} citations)`);
+  } else {
+    searchQuery = topic;
+    logLabel    = `topic: "${topic}"`;
+    console.log(`🔍 [topic mode] Crawling "${topic}" — top ${limit} papers sorted by recency`);
+  }
 
   // ── Query Semantic Scholar ────────────────────────────────────
-  // Strategy: search by venue + year, sort by citationCount desc
-  const query = `${conference} ${year}`;
-  const params = new URLSearchParams({
-    query,
+  const ssParams = new URLSearchParams({
+    query:  searchQuery,
     fields: FIELDS,
-    year:   `${year}`,
-    limit:  String(Math.min(limit * 4, 100)), // over-fetch; filter below
-    sort:   "citationCount:desc",
+    limit:  String(Math.min(limit * 5, 100)), // over-fetch; we'll filter & slice
   });
+  // In conference mode: filter by year, sort by citations
+  // In topic mode: sort by year desc (recent arXiv papers), no year filter
+  if (mode === "conference") {
+    ssParams.set("year", `${year}`);
+    ssParams.set("sort", "citationCount:desc");
+  } else {
+    ssParams.set("sort", "year:desc");
+  }
 
   let papers = [];
   try {
-    const res  = await fetchWithRetry(`${API_BASE}/paper/search?${params}`);
+    const res  = await fetchWithRetry(`${API_BASE}/paper/search?${ssParams}`);
     const data = await res.json();
     papers = data.data || [];
     console.log(`📦 Received ${papers.length} results from Semantic Scholar`);
@@ -136,95 +170,158 @@ async function main() {
     process.exit(1);
   }
 
-  // Filter: must mention the conference in venue field and have enough citations
+  // ── Filter ────────────────────────────────────────────────────
   const filtered = papers
     .filter((p) => {
-      const venue = (p.venue || "").toUpperCase();
-      return (
-        venue.includes(conference) &&
-        (p.citationCount || 0) >= minCites &&
-        p.title &&
-        p.externalIds?.ArXiv
-      );
+      if (!p.title || !p.externalIds?.ArXiv) return false;
+      if ((p.citationCount || 0) < minCites) return false;
+      // Conference mode: must mention venue
+      if (mode === "conference") {
+        const venue = (p.venue || "").toUpperCase();
+        if (!venue.includes(conference)) return false;
+      }
+      return true;
     })
-    .sort((a, b) => (b.citationCount || 0) - (a.citationCount || 0))
+    .sort((a, b) =>
+      mode === "conference"
+        ? (b.citationCount || 0) - (a.citationCount || 0)
+        : (b.year || 0) - (a.year || 0)
+    )
     .slice(0, limit);
 
-  console.log(`✅ ${filtered.length} papers pass filter (venue match + ≥${minCites} citations + arXiv ID)`);
+  console.log(`✅ ${filtered.length} papers pass filter`);
 
   if (filtered.length === 0) {
-    console.log("⚠️  No papers match criteria. Try lowering MIN_CITATIONS or check the conference name.");
+    const tip = mode === "conference"
+      ? "Try lowering MIN_CITATIONS or check the conference name."
+      : "Try different keywords or check spelling.";
+    console.log(`⚠️  No papers match criteria. ${tip}`);
     process.exit(0);
   }
 
-  // ── Deduplication ─────────────────────────────────────────────
+  // ── Collect existing arXiv IDs (seeds + cycle nominations) ────
   const seedsPath = path.resolve(__dirname, "../data/seeds.json");
   const seeds = JSON.parse(fs.readFileSync(seedsPath, "utf8"));
-  const existingArxivIds = new Set(
-    seeds
-      .map((s) => (s.arxiv || "").match(/abs\/([0-9.]+)/)?.[1])
-      .filter(Boolean)
-  );
+
+  const existingArxivIds = new Set([
+    ...seeds.map((s) => (s.arxiv || "").match(/abs\/([0-9.]+)/)?.[1]).filter(Boolean),
+    ...cycles.flatMap((c) =>
+      (c.nominations || []).map((n) => (n.arxiv || "").match(/abs\/([0-9.]+)/)?.[1]).filter(Boolean)
+    ),
+  ]);
 
   const newPapers = filtered.filter((p) => {
     const aid = p.externalIds?.ArXiv;
     return aid && !existingArxivIds.has(aid);
   });
 
-  console.log(`🆕 ${newPapers.length} new (${filtered.length - newPapers.length} already in seeds.json)`);
+  console.log(`🆕 ${newPapers.length} new (${filtered.length - newPapers.length} already in data)`);
 
   if (newPapers.length === 0) {
-    console.log("✅ seeds.json is already up to date.");
+    console.log("✅ All found papers are already in the dataset.");
     process.exit(0);
   }
 
-  // ── Build new seed entries ────────────────────────────────────
-  // Find next ID number
-  const maxId = seeds.reduce((max, s) => {
-    const n = parseInt((s.id || "s000").replace(/[^0-9]/g, ""), 10);
-    return isNaN(n) ? max : Math.max(max, n);
-  }, 0);
+  // ── Build paper entries ───────────────────────────────────────
+  const conferenceLabel = mode === "conference" ? `${conference} ${year}` : "Preprint";
 
-  const newSeeds = newPapers.map((p, i) => {
+  const builtPapers = newPapers.map((p) => {
     const arxivId = p.externalIds.ArXiv;
     const domain  = inferDomain(p.fieldsOfStudy, p.title);
     const tags    = inferTags(p.title, p.abstract, p.fieldsOfStudy);
     const authors = (p.authors || []).slice(0, 3).map((a) => a.name).join(", ");
     const shortAbstract = (p.abstract || "").replace(/\s+/g, " ").trim().slice(0, 180);
-
     return {
-      id: `s${String(maxId + i + 1).padStart(3, "0")}`,
-      title: p.title,
-      conference: `${conference} ${year}`,
-      year,
+      title:          p.title,
+      conference:     conferenceLabel,
+      year:           p.year || year,
       domain,
       tags,
-      arxiv: `https://arxiv.org/abs/${arxivId}`,
-      proposedBy: "VJAI Bot (crawled)",
-      claimedBy: null,
+      arxiv:          `https://arxiv.org/abs/${arxivId}`,
+      authors:        authors || "Unknown",
+      citationCount:  p.citationCount || 0,
       hackabilityScore: hackabilityScore(p),
-      citationCount: p.citationCount || 0,
-      authors: authors || "Unknown",
-      description: shortAbstract ? shortAbstract + (p.abstract?.length > 180 ? "…" : "") : p.title,
+      description:    shortAbstract ? shortAbstract + ((p.abstract?.length ?? 0) > 180 ? "…" : "") : p.title,
     };
   });
 
-  const updated = [...seeds, ...newSeeds];
-  fs.writeFileSync(seedsPath, JSON.stringify(updated, null, 2) + "\n");
-  console.log(`💾 Saved ${newSeeds.length} new seeds to seeds.json`);
+  // ── Write output ──────────────────────────────────────────────
+  let writtenFiles = [];
+  let summaryTarget = "";
 
-  // ── GitHub outputs ─────────────────────────────────────────────
-  const rows = newSeeds.map((s) =>
-    `| [${s.title.slice(0, 60)}](${s.arxiv}) | ${s.domain} | ${s.citationCount} | ${s.hackabilityScore} |`
+  if (targetCycle) {
+    // ── Mode A: inject as organizer suggestions into cycle nominations ──
+    const existingNomIds = targetCycle.nominations.map((n) => n.id);
+    const maxNomNum = existingNomIds.reduce((max, id) => {
+      const n = parseInt((id || "p0").replace(/[^0-9]/g, ""), 10);
+      return isNaN(n) ? max : Math.max(max, n);
+    }, 0);
+
+    const newNominations = builtPapers.map((p, i) => ({
+      id:           `p${maxNomNum + i + 1}`,
+      title:        p.title,
+      proposer:     "VJAI Bot (organizer suggestion)",
+      arxiv:        p.arxiv,
+      tags:         p.tags,
+      is_selected:  false,
+      votes:        0,
+      authors:      p.authors,
+      citationCount: p.citationCount,
+      crawledFrom:  logLabel,
+      description:  p.description,
+    }));
+
+    targetCycle.nominations = [...targetCycle.nominations, ...newNominations];
+
+    const cycleIdx = cycles.findIndex((c) => c.id === cycleId);
+    cycles[cycleIdx] = targetCycle;
+    fs.writeFileSync(cyclesPath, JSON.stringify(cycles, null, 2) + "\n");
+    writtenFiles.push("data/cycles.json");
+    summaryTarget = `cycle \`${cycleId}\` nominations`;
+    console.log(`💾 Added ${newNominations.length} organizer suggestions to cycle "${cycleId}"`);
+  } else {
+    // ── Mode B: append to seeds.json ─────────────────────────────
+    const maxId = seeds.reduce((max, s) => {
+      const n = parseInt((s.id || "s000").replace(/[^0-9]/g, ""), 10);
+      return isNaN(n) ? max : Math.max(max, n);
+    }, 0);
+
+    const newSeeds = builtPapers.map((p, i) => ({
+      id:              `s${String(maxId + i + 1).padStart(3, "0")}`,
+      proposedBy:      "VJAI Bot (crawled)",
+      claimedBy:       null,
+      ...p,
+    }));
+
+    const updated = [...seeds, ...newSeeds];
+    fs.writeFileSync(seedsPath, JSON.stringify(updated, null, 2) + "\n");
+    writtenFiles.push("data/seeds.json");
+    summaryTarget = "`data/seeds.json`";
+    console.log(`💾 Saved ${newSeeds.length} new papers to seeds.json`);
+  }
+
+  // ── GitHub outputs ────────────────────────────────────────────
+  const rows = builtPapers.map((p) =>
+    `| [${p.title.slice(0, 55)}…](${p.arxiv}) | ${p.domain} | ${p.citationCount} | ${p.hackabilityScore} |`
   ).join("\n");
 
-  const summary = `## 🤖 Paper Crawl Complete\n\n**Conference:** ${conference} ${year}\n**New papers added:** ${newSeeds.length}\n\n| Title | Domain | Citations | Hackability |\n|---|---|---|---|\n${rows}\n`;
+  const modeLabel = mode === "conference" ? `${conference} ${year}` : `topic "${topic}"`;
+  const summary   = [
+    `## 🤖 Paper Crawl Complete`,
+    ``,
+    `**Mode:** ${mode} | **Source:** ${modeLabel}`,
+    `**Target:** ${summaryTarget}`,
+    `**Papers added:** ${builtPapers.length}`,
+    ``,
+    `| Title | Domain | Citations | Hackability |`,
+    `|---|---|---|---|`,
+    rows,
+  ].join("\n");
 
-  if (process.env.GITHUB_STEP_SUMMARY) {
-    fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, summary);
-  }
+  if (process.env.GITHUB_STEP_SUMMARY) fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, summary + "\n");
   if (process.env.GITHUB_OUTPUT) {
-    fs.appendFileSync(process.env.GITHUB_OUTPUT, `count<<EOF\n${newSeeds.length}\nEOF\n`);
+    fs.appendFileSync(process.env.GITHUB_OUTPUT, `count<<EOF\n${builtPapers.length}\nEOF\n`);
+    fs.appendFileSync(process.env.GITHUB_OUTPUT, `files<<EOF\n${writtenFiles.join(",")}\nEOF\n`);
     fs.appendFileSync(process.env.GITHUB_OUTPUT, `summary<<EOF\n${summary}\nEOF\n`);
   }
 }

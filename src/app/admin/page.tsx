@@ -473,22 +473,38 @@ const CONF_DESC: Record<Conf, string> = {
   NAACL:   "North American NLP",
 };
 
+type CrawlMode = "topic" | "conference";
+
 function TabCrawlPapers() {
+  // Target cycle
+  const [targetCycleId, setTargetCycleId] = useState("");
+  // Mode
+  const [mode, setMode] = useState<CrawlMode>("topic");
+  // Conference mode params
   const [conf, setConf]         = useState<Conf>("ICLR");
   const [year, setYear]         = useState(String(new Date().getFullYear() - 1));
-  const [limit, setLimit]       = useState("20");
-  const [minCites, setMinCites] = useState("50");
+  const [minCites, setMinCites] = useState("30");
+  // Topic mode params
+  const [topic, setTopic]       = useState("");
+  // Shared
+  const [limit, setLimit]       = useState("15");
   const [error, setError]       = useState("");
 
+  const targetCycle = cycles.find((c) => c.id === targetCycleId);
+
   function validate() {
-    const y = parseInt(year, 10);
-    if (isNaN(y) || y < 2015 || y > new Date().getFullYear()) {
-      setError(`Year must be between 2015 and ${new Date().getFullYear()}.`); return false;
+    if (mode === "conference") {
+      const y = parseInt(year, 10);
+      if (isNaN(y) || y < 2015 || y > new Date().getFullYear()) {
+        setError(`Year must be between 2015 and ${new Date().getFullYear()}.`); return false;
+      }
+      const m = parseInt(minCites, 10);
+      if (isNaN(m) || m < 0) { setError("Min citations must be ≥ 0."); return false; }
+    } else {
+      if (!topic.trim()) { setError("Please enter a topic or keywords."); return false; }
     }
     const l = parseInt(limit, 10);
     if (isNaN(l) || l < 1 || l > 100) { setError("Limit must be 1–100."); return false; }
-    const m = parseInt(minCites, 10);
-    if (isNaN(m) || m < 0) { setError("Min citations must be ≥ 0."); return false; }
     setError(""); return true;
   }
 
@@ -498,62 +514,168 @@ function TabCrawlPapers() {
     window.open(`https://github.com/${REPO}/actions/workflows/crawl-papers.yml`, "_blank", "noopener");
   }
 
+  // Build the params summary shown to the user for the manual step
+  const paramSummary = mode === "conference"
+    ? `mode=conference, conference=${conf}, year=${year}, cycle_id=${targetCycleId || "(seeds)"}, limit=${limit}, min_citations=${minCites}`
+    : `mode=topic, topic="${topic}", cycle_id=${targetCycleId || "(seeds)"}, limit=${limit}`;
+
   return (
     <div className="grid lg:grid-cols-5 gap-8">
+
+      {/* ── Left: Target cycle picker ── */}
       <div className="lg:col-span-2 flex flex-col gap-3">
-        <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: "rgba(232,234,246,0.35)" }}>Target Conference</p>
-        {CONFERENCES.map((c) => {
-          const isSelected = conf === c;
+        <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: "rgba(232,234,246,0.35)" }}>
+          Target Cycle
+          <span className="ml-1.5 font-normal normal-case" style={{ color: "rgba(232,234,246,0.3)" }}>(optional)</span>
+        </p>
+        <p className="text-xs mb-1" style={{ color: "rgba(232,234,246,0.35)" }}>
+          Papers become organizer suggestions for the chosen cycle. Leave unselected to add to the global seed pool.
+        </p>
+
+        {/* No cycle option */}
+        <button onClick={() => setTargetCycleId("")}
+          className="w-full text-left rounded-2xl p-3 transition-all"
+          style={{ background: targetCycleId === "" ? "rgba(171,71,188,0.08)" : "rgba(255,255,255,0.02)", border: targetCycleId === "" ? "1px solid rgba(171,71,188,0.4)" : "1px solid rgba(255,255,255,0.06)" }}>
+          <div className="flex items-center gap-2">
+            <Database size={13} style={{ color: targetCycleId === "" ? "#AB47BC" : "rgba(232,234,246,0.35)" }} />
+            <span className="text-xs font-bold" style={{ color: targetCycleId === "" ? "#e8eaf6" : "rgba(232,234,246,0.5)" }}>
+              Global seed pool (seeds.json)
+            </span>
+          </div>
+        </button>
+
+        {cycles.map((c) => {
+          const pk = getPhaseKey(c);
+          const isSelected = targetCycleId === c.id;
           return (
-            <button key={c} onClick={() => setConf(c)}
+            <button key={c.id} onClick={() => setTargetCycleId(c.id)}
               className="w-full text-left rounded-2xl p-4 transition-all"
               style={{ background: isSelected ? "rgba(171,71,188,0.08)" : "rgba(255,255,255,0.03)", border: isSelected ? "1px solid rgba(171,71,188,0.4)" : "1px solid rgba(255,255,255,0.07)" }}>
-              <p className="text-sm font-bold text-white">{c}</p>
-              <p className="text-xs mt-0.5" style={{ color: "rgba(232,234,246,0.4)" }}>{CONF_DESC[c]}</p>
+              <div className="flex items-center justify-between gap-2 mb-1">
+                <span className="text-sm font-bold text-white">{cycleLabel(c)}</span>
+                <PhaseBadge phaseKey={pk} />
+              </div>
+              <p className="text-xs" style={{ color: "rgba(232,234,246,0.4)" }}>{c.theme}</p>
+              <p className="text-xs mt-1" style={{ color: "rgba(232,234,246,0.25)" }}>
+                {c.nominations?.length ?? 0} nomination{(c.nominations?.length ?? 0) !== 1 ? "s" : ""} so far
+              </p>
             </button>
           );
         })}
       </div>
 
+      {/* ── Right: Mode + params ── */}
       <div className="lg:col-span-3 flex flex-col gap-5">
-        <div className="rounded-2xl p-5 flex flex-col gap-3"
+
+        {/* Target summary */}
+        <div className="rounded-2xl p-4 flex items-center gap-3"
           style={{ background: "rgba(171,71,188,0.06)", border: "1px solid rgba(171,71,188,0.2)" }}>
-          <div className="flex items-center gap-2">
-            <Database size={16} style={{ color: "#AB47BC" }} />
-            <p className="text-sm font-bold text-white">How the crawler works</p>
+          <Database size={16} style={{ color: "#AB47BC" }} />
+          <div>
+            <p className="text-xs font-bold text-white">
+              {targetCycle ? `Suggestions → ${cycleLabel(targetCycle)} nominations` : "Suggestions → global seed pool"}
+            </p>
+            <p className="text-xs mt-0.5" style={{ color: "rgba(232,234,246,0.4)" }}>
+              {targetCycle ? targetCycle.theme : "Papers go to seeds.json for any future cycle to pick up"}
+            </p>
           </div>
-          <ul className="flex flex-col gap-1.5 text-xs" style={{ color: "rgba(232,234,246,0.55)" }}>
-            <li className="flex items-start gap-2"><span style={{ color: "#AB47BC" }}>→</span> Queries <strong style={{ color: "#e8eaf6" }}>Semantic Scholar</strong> for papers from the selected conference &amp; year</li>
-            <li className="flex items-start gap-2"><span style={{ color: "#AB47BC" }}>→</span> Filters by citation count, venue match, and arXiv availability</li>
-            <li className="flex items-start gap-2"><span style={{ color: "#AB47BC" }}>→</span> Auto-deduplicates against existing <code style={{ color: "#AB47BC" }}>seeds.json</code></li>
-            <li className="flex items-start gap-2"><span style={{ color: "#AB47BC" }}>→</span> Infers domain, tags &amp; hackability score automatically</li>
-            <li className="flex items-start gap-2"><span style={{ color: "#AB47BC" }}>→</span> Commits to repo &amp; redeploys the site</li>
-          </ul>
         </div>
 
+        {/* Mode toggle */}
+        <div className="grid grid-cols-2 gap-3">
+          {([
+            {
+              m: "topic" as const,
+              icon: <Search size={15} />,
+              label: "Topic / Keyword",
+              desc: "Best when cycle is before the conference — search arXiv by topic",
+              color: "#42A5F5",
+              bg: "rgba(66,165,245,0.08)",
+              border: "rgba(66,165,245,0.3)",
+            },
+            {
+              m: "conference" as const,
+              icon: <Database size={15} />,
+              label: "Conference Venue",
+              desc: "Best after proceedings are published — filter by venue + year",
+              color: "#AB47BC",
+              bg: "rgba(171,71,188,0.08)",
+              border: "rgba(171,71,188,0.3)",
+            },
+          ] as const).map(({ m, icon, label, desc, color, bg, border }) => (
+            <button key={m} type="button" onClick={() => { setMode(m); setError(""); }}
+              className="rounded-2xl p-4 text-left transition-all flex flex-col gap-1.5"
+              style={{ color, background: mode === m ? bg : "rgba(255,255,255,0.03)", border: `1px solid ${mode === m ? border : "rgba(255,255,255,0.07)"}` }}>
+              <div className="flex items-center gap-2">
+                {icon}
+                <span className="text-xs font-bold" style={{ color: mode === m ? "#e8eaf6" : "rgba(232,234,246,0.6)" }}>{label}</span>
+              </div>
+              <p className="text-xs leading-relaxed" style={{ color: "rgba(232,234,246,0.4)" }}>{desc}</p>
+            </button>
+          ))}
+        </div>
+
+        {/* Params form */}
         <form onSubmit={handleLaunch} className="flex flex-col gap-5">
           <div className="rounded-2xl p-6 flex flex-col gap-5" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
-            <p className="text-xs font-bold uppercase tracking-widest" style={{ color: "rgba(232,234,246,0.35)" }}>Parameters</p>
-            <div className="flex items-center gap-3">
-              <span className="text-sm font-bold" style={{ color: "rgba(232,234,246,0.5)" }}>Conference:</span>
-              <span className="inline-flex items-center gap-1.5 text-sm font-black px-3 py-1 rounded-full"
-                style={{ color: "#AB47BC", background: "rgba(171,71,188,0.12)", border: "1px solid rgba(171,71,188,0.3)" }}>
-                <Search size={12} />{conf}
-              </span>
-            </div>
-            <div className="grid grid-cols-3 gap-4">
-              <Field label="Year" value={year} onChange={setYear} type="text" placeholder={String(new Date().getFullYear() - 1)} />
-              <Field label="Max Papers" hint="1–100" value={limit} onChange={setLimit} type="text" required={false} placeholder="20" />
-              <Field label="Min Citations" hint="Quality filter" value={minCites} onChange={setMinCites} type="text" required={false} placeholder="50" />
-            </div>
+            <p className="text-xs font-bold uppercase tracking-widest" style={{ color: "rgba(232,234,246,0.35)" }}>
+              {mode === "topic" ? "Topic Search Parameters" : "Conference Parameters"}
+            </p>
+
+            {mode === "topic" ? (
+              <>
+                <Field
+                  label="Keywords / Topic"
+                  hint="What to search on Semantic Scholar + arXiv. Be specific."
+                  value={topic}
+                  onChange={setTopic}
+                  type="text"
+                  placeholder='e.g. "reasoning LLM 2025" or "vision language models efficient"'
+                />
+                <Field label="Max Papers" hint="1–100" value={limit} onChange={setLimit} type="text" required={false} placeholder="15" />
+              </>
+            ) : (
+              <>
+                {/* Conference picker */}
+                <div>
+                  <p className="text-xs font-bold text-white mb-2 flex items-center gap-1">
+                    Conference<span style={{ color: "#FF5722" }}>*</span>
+                  </p>
+                  <div className="grid grid-cols-3 gap-2">
+                    {CONFERENCES.map((c) => (
+                      <button key={c} type="button" onClick={() => setConf(c)}
+                        className="rounded-xl px-3 py-2 text-xs font-bold transition-all"
+                        style={{
+                          color: conf === c ? "#AB47BC" : "rgba(232,234,246,0.5)",
+                          background: conf === c ? "rgba(171,71,188,0.12)" : "rgba(255,255,255,0.02)",
+                          border: `1px solid ${conf === c ? "rgba(171,71,188,0.4)" : "rgba(255,255,255,0.07)"}`,
+                        }}>
+                        {c}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="grid grid-cols-3 gap-4">
+                  <Field label="Year" value={year} onChange={setYear} type="text" placeholder="2025" />
+                  <Field label="Max Papers" hint="1–100" value={limit} onChange={setLimit} type="text" required={false} placeholder="15" />
+                  <Field label="Min Citations" hint="Quality filter" value={minCites} onChange={setMinCites} type="text" required={false} placeholder="30" />
+                </div>
+              </>
+            )}
+
+            {/* Manual step callout */}
             <div className="rounded-xl p-3 flex items-start gap-2.5 text-xs"
               style={{ background: "rgba(255,152,0,0.06)", border: "1px solid rgba(255,152,0,0.2)", color: "rgba(232,234,246,0.55)" }}>
               <Info size={13} className="shrink-0 mt-0.5" style={{ color: "#FF9800" }} />
-              <span>
-                <strong style={{ color: "#e8eaf6" }}>Manual step required:</strong> The button below opens the GitHub Actions page.
-                Click <strong style={{ color: "#e8eaf6" }}>&ldquo;Run workflow&rdquo;</strong>, fill in {conf}, {year}, {limit}, {minCites} and trigger it.
-                The bot handles the rest automatically.
-              </span>
+              <div className="flex flex-col gap-1">
+                <span>
+                  <strong style={{ color: "#e8eaf6" }}>Manual step required:</strong> Click below to open GitHub Actions, then click <strong style={{ color: "#e8eaf6" }}>&ldquo;Run workflow&rdquo;</strong> and paste these parameters:
+                </span>
+                <code className="mt-1 block rounded-lg px-3 py-2 text-xs leading-relaxed break-all"
+                  style={{ background: "rgba(0,0,0,0.3)", color: "#CE93D8", border: "1px solid rgba(171,71,188,0.2)" }}>
+                  {paramSummary}
+                </code>
+              </div>
             </div>
           </div>
 
@@ -567,7 +689,7 @@ function TabCrawlPapers() {
             <ExternalLink size={14} />
           </button>
           <p className="text-xs text-center" style={{ color: "rgba(232,234,246,0.35)" }}>
-            Runs on GitHub&apos;s servers. Papers are added to <code>data/seeds.json</code> and the site redeploys automatically.
+            Runs on GitHub&apos;s servers. Papers are injected as organizer suggestions into the target cycle (or seeds.json), then the site redeploys.
           </p>
         </form>
       </div>
@@ -578,16 +700,16 @@ function TabCrawlPapers() {
 /* ════════════════════════════════════════════════════════════
    ROOT PAGE
 ════════════════════════════════════════════════════════════ */
-type Tab = "dates" | "cycles" | "crawl";
+type Tab = "cycles" | "dates" | "crawl";
 
 const TABS: { id: Tab; label: string; icon: React.ReactNode; desc: string }[] = [
-  { id: "dates",  label: "Set Dates",     icon: <Calendar size={16} />,   desc: "Exploration & Deep Dive dates for a cycle" },
   { id: "cycles", label: "Manage Cycles", icon: <LayoutGrid size={16} />, desc: "Change status, edit theme, or delete" },
-  { id: "crawl",  label: "Crawl Papers",  icon: <Search size={16} />,     desc: "Auto-fetch top papers from a conference" },
+  { id: "dates",  label: "Set Dates",     icon: <Calendar size={16} />,   desc: "Exploration & Deep Dive dates for a cycle" },
+  { id: "crawl",  label: "Crawl Papers",  icon: <Search size={16} />,     desc: "Fetch suggestions for a cycle or seed pool" },
 ];
 
 export default function AdminPage() {
-  const [tab, setTab] = useState<Tab>("dates");
+  const [tab, setTab] = useState<Tab>("cycles");
 
   return (
     <div className="min-h-screen flex flex-col"
