@@ -1,0 +1,75 @@
+name: "📅 Set Cycle Dates"
+description: "Set or update the Exploration session and Deep Dive dates for a cycle."
+title: "Set Dates: [CYCLE ID]"
+labels: ["set-dates", "admin"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Set Cycle Dates
+        Use this form to set (or update) the **Exploration session** date and the **Deep Dive session** date for a cycle.
+        The bot will update `cycles.json` and redeploy the site automatically.
+
+  - type: input
+    id: cycle_id
+    attributes:
+      label: "Cycle ID"
+      description: "The ID of the cycle to update, e.g. 2026-may"
+      placeholder: "2026-may"
+    validations:
+      required: true
+
+  - type: input
+    id: nomination_end
+    attributes:
+      label: "Nomination Deadline (YYYY-MM-DD)"
+      description: "Last day members can submit nominations (inclusive)."
+      placeholder: "2026-04-29"
+    validations:
+      required: true
+
+  - type: input
+    id: exploration_start
+    attributes:
+      label: "Exploration Session Date (YYYY-MM-DD)"
+      description: "Date of the Exploration session where all nominators present. Voting opens immediately after."
+      placeholder: "2026-04-30"
+    validations:
+      required: true
+
+  - type: input
+    id: session_date
+    attributes:
+      label: "Deep Dive Session Date (YYYY-MM-DD)"
+      description: "Date of the Deep Dive session for the winning paper."
+      placeholder: "2026-05-17"
+    validations:
+      required: true
+
+  - type: input
+    id: presenter
+    attributes:
+      label: "Presenter (optional — leave blank to keep existing)"
+      description: "Name of the Deep Dive presenter. Leave blank if not yet decided."
+      placeholder: "Duc Vo"
+    validations:
+      required: false
+
+  - type: input
+    id: presenter_role
+    attributes:
+      label: "Presenter Role (optional)"
+      placeholder: "ML Engineer · VJAI Core"
+    validations:
+      required: false
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: "Notes (optional)"
+      description: "Any context or reason for the date change."
+      placeholder: "Rescheduled due to public holiday."
+    validations:
+      required: false

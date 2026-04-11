@@ -1,0 +1,94 @@
+name: "📅 Set Cycle Dates"
+
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  set-cycle-dates:
+    if: github.event.label.name == 'set-dates'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Run set-cycle-dates script
+        id: set_dates
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: node scripts/set-cycle-dates.js
+
+      - name: Commit updated cycles.json
+        run: |
+          git config user.name "vjai-bot"
+          git config user.email "bot@vjai.dev"
+          git add data/cycles.json
+          git diff --staged --quiet || git commit -m "📅 dates: update cycle dates from issue #${{ github.event.issue.number }}"
+          git push
+
+      - name: Comment on Issue and close it
+        uses: actions/github-script@v7
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
+        with:
+          script: |
+            const { parseIssueBody } = require('./scripts/lib/parse-issue.js');
+            const fields = parseIssueBody(process.env.ISSUE_BODY);
+
+            const cycleId        = (fields["cycle id"] || "").trim();
+            const nominationEnd  = (fields["nomination deadline yyyymmdd"] || fields["nomination deadline"] || "").trim();
+            const explorationStart = (fields["exploration session date yyyymmdd"] || fields["exploration session date"] || "").trim();
+            const sessionDate    = (fields["deep dive session date yyyymmdd"] || fields["deep dive session date"] || "").trim();
+            const presenter      = (fields["presenter optional  leave blank to keep existing"] || fields["presenter"] || "").trim();
+
+            const body = [
+              `## 📅 Cycle Dates Updated!`,
+              ``,
+              `**Cycle:** \`${cycleId}\``,
+              ``,
+              `| Phase | Date |`,
+              `|---|---|`,
+              `| 📝 Nomination Deadline | \`${nominationEnd}\` |`,
+              `| 👥 Exploration Session | \`${explorationStart}\` |`,
+              `| 🔬 Deep Dive Session   | \`${sessionDate}\` |`,
+              presenter ? `| 🎤 Presenter | ${presenter} |` : "",
+              ``,
+              `The site will rebuild automatically. Changes will be live in ~2 minutes.`,
+            ].filter(line => line !== undefined && !(line === "" && false)).join("\n");
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body,
+            });
+
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              state: "closed",
+            });
+
+      - name: Trigger site rebuild
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: "deploy.yml",
+              ref: "main",
+            });
