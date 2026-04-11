@@ -156,7 +156,7 @@ export default function RoadmapPage() {
           <div className="text-4xl mb-6">🗳️</div>
           <h2 className="text-3xl font-black text-white mb-4">Nominate a Paper</h2>
           <p className="text-base mb-8" style={{ color: "rgba(232,234,246,0.6)" }}>
-            Upcoming months are open for community picks. Submit a nomination — the top-voted papers get scheduled for the next cycle.
+            Open a GitHub issue to nominate a paper for the current active cycle. You commit to presenting it at the Exploration session — after all presentations, the community votes for one paper to deep-dive.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <a

@@ -350,7 +350,7 @@ export default function GuidePage() {
               { href: "/", label: "Home", icon: <MapPin size={15} />, desc: "Overview, active cycle status, recent archive entries, and countdown to next session.", color: "#FF5722" },
               { href: "/seeds", label: "Seeds", icon: <Sprout size={15} />, desc: "Browse all nominations for active cycles. Nominate seeds, vote during voting phase.", color: "#66BB6A" },
               { href: "/cycle", label: "Cycle", icon: <GitFork size={15} />, desc: "Full detail of every cycle — nominations, vote bars, session agenda, and Deep Dive spotlight.", color: "#42A5F5" },
-              { href: "/roadmap", label: "Roadmap", icon: <Calendar size={15} />, desc: "Year-at-a-glance view of all 8 cycles, their themes, and status.", color: "#FF9800" },
+              { href: "/roadmap", label: "Roadmap", icon: <Calendar size={15} />, desc: "Year-at-a-glance view of all planned cycles, their themes, and status.", color: "#FF9800" },
               { href: "/archive", label: "Archive", icon: <BookOpen size={15} />, desc: "All past sessions — recordings, notes, vibe scores, and reproduced code repos.", color: "#4CAF50" },
             ].map((page) => (
               <Link

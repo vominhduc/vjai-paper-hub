@@ -392,55 +392,8 @@ export default function Home() {
         </section>
       )}
 
-      {/* ══ LATEST CONTRIBUTIONS ═════════════════════════════ */}
-      <section
-        className="py-20"
-        style={{ background: "rgba(7,12,38,0.5)" }}
-      >
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex items-end justify-between mb-10">
-            <div>
-              <SectionLabel>Community Output</SectionLabel>
-              <h2 className="text-3xl font-black text-white">Latest Contributions</h2>
-            </div>
-            <Link
-              href="/archive"
-              className="text-sm font-semibold flex items-center gap-1.5"
-              style={{ color: "#FF5722" }}
-            >
-              Full Archive <ArrowRight size={13} />
-            </Link>
-          </div>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-            {recentPapers.slice(0, 4).map((paper) => (
-              <div
-                key={paper.id}
-                className="stat-card glass-card glow-border-hover rounded-xl p-5 flex flex-col gap-3"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold px-2.5 py-0.5 rounded-full paper-tag">
-                    {paper.status}
-                  </span>
-                  <span className="text-xs" style={{ color: "rgba(232,234,246,0.35)" }}>
-                    {paper.date_read}
-                  </span>
-                </div>
-                <div className="text-2xl">
-                  {paper.status === "Reproduced" ? "⚙️" : paper.status === "Reviewed" ? "📝" : "🎥"}
-                </div>
-                <p className="text-sm font-semibold text-white leading-snug flex-1">{paper.title}</p>
-                <p className="text-xs" style={{ color: "rgba(232,234,246,0.45)" }}>
-                  by {paper.presenter}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* ══ RECENT PAPERS ════════════════════════════════════ */}
-      <section className="py-20">
+      <section className="py-20" style={{ background: "rgba(7,12,38,0.5)" }}>
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex items-end justify-between mb-10">
             <div>
@@ -546,7 +499,7 @@ export default function Home() {
               From Paper to Prototype
             </h2>
             <p className="text-base mb-8 relative" style={{ color: "rgba(232,234,246,0.6)" }}>
-              Join 120+ AI engineers and researchers in Vietnam &amp; Japan building at the frontier.
+              Join {siteStats.activeMembers}+ AI engineers and researchers in Vietnam &amp; Japan building at the frontier.
               Next session: <strong style={{ color: "#FF5722" }}>
                 {activeCycle?.session.date ?? "Coming Soon"}
               </strong>.
