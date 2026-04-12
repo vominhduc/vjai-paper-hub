@@ -20,6 +20,8 @@ body:
         - "status — change the cycle status"
         - "edit — update theme / month / year"
         - "delete — remove a planned cycle with no nominations"
+        - "select — mark the winning nomination"
+        - "agenda — set the session agenda items"
     validations:
       required: true
 
@@ -60,6 +62,29 @@ body:
       label: "New Year (for edit action)"
       description: "Four-digit year. Leave blank to keep existing."
       placeholder: "e.g. 2026"
+    validations:
+      required: false
+
+  - type: input
+    id: nomination_id
+    attributes:
+      label: "Nomination ID (for select action)"
+      description: "The `id` of the winning nomination, e.g. `p1`. Find it on the Cycle page."
+      placeholder: "e.g. p1"
+    validations:
+      required: false
+
+  - type: textarea
+    id: agenda_items
+    attributes:
+      label: "Agenda Items (for agenda action, one per line)"
+      description: "Session agenda. Enter one item per line. Leading - or • are stripped automatically."
+      placeholder: |
+        - Paper motivation and background
+        - Methodology deep-dive
+        - Live demo / code walkthrough
+        - Benchmark analysis
+        - Open Q&A
     validations:
       required: false
 

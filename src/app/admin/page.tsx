@@ -20,6 +20,9 @@ import {
   LayoutGrid,
   ArrowRight,
   Info,
+  Trophy,
+  ListOrdered,
+  PlayCircle,
 } from "lucide-react";
 import { cycles, getCyclePhase, cycleLabel } from "@/lib/data";
 import type { CyclePhase } from "@/lib/data";
@@ -248,7 +251,7 @@ function TabSetDates() {
 /* ════════════════════════════════════════════════════════════
    TAB 2 — MANAGE CYCLES
 ════════════════════════════════════════════════════════════ */
-type ManageAction = "status" | "edit" | "delete" | null;
+type ManageAction = "status" | "edit" | "delete" | "select" | "agenda" | null;
 
 function TabManageCycles() {
   const [selectedId, setSelectedId] = useState("");
@@ -257,6 +260,8 @@ function TabManageCycles() {
   const [newTheme, setNewTheme]     = useState("");
   const [newMonth, setNewMonth]     = useState("");
   const [newYear, setNewYear]       = useState("");
+  const [selectNomId, setSelectNomId] = useState("");
+  const [agendaText, setAgendaText]   = useState("");
   const [notes, setNotes]           = useState("");
   const [error, setError]           = useState("");
 
@@ -270,6 +275,8 @@ function TabManageCycles() {
       setNewTheme(c.theme || "");
       setNewMonth(c.month || "");
       setNewYear(c.year ? String(c.year) : "");
+      setSelectNomId("");
+      setAgendaText((c.session?.agenda ?? []).join("\n"));
       setNotes("");
     }
   }
@@ -280,6 +287,8 @@ function TabManageCycles() {
     const actionLabel =
       action === "status" ? "status — change the cycle status" :
       action === "edit"   ? "edit — update theme / month / year" :
+      action === "select" ? "select — mark the winning nomination" :
+      action === "agenda" ? "agenda — set the session agenda items" :
                             "delete — remove a planned cycle with no nominations";
     const statusLabel = action === "status" ? newStatus : "no change";
 
@@ -291,6 +300,8 @@ function TabManageCycles() {
       `### New Theme (for edit action)`, action === "edit" && newTheme ? newTheme : "_No response_", ``,
       `### New Month (for edit action)`, action === "edit" && newMonth ? newMonth : "_No response_", ``,
       `### New Year (for edit action)`, action === "edit" && newYear ? newYear : "_No response_", ``,
+      `### Nomination ID (for select action)`, action === "select" && selectNomId ? selectNomId : "_No response_", ``,
+      `### Agenda Items (for agenda action, one per line)`, action === "agenda" && agendaText ? agendaText : "_No response_", ``,
       `### Notes (optional)`, notes || "_No response_",
     ].join("\n");
 
@@ -302,6 +313,12 @@ function TabManageCycles() {
     e.preventDefault();
     if (action === "delete" && selected?.status !== "planned") {
       setError("Only planned cycles can be deleted."); return;
+    }
+    if (action === "select" && !selectNomId.trim()) {
+      setError("Please enter a nomination ID."); return;
+    }
+    if (action === "agenda" && !agendaText.trim()) {
+      setError("Please enter at least one agenda item."); return;
     }
     const url = buildIssueUrl();
     if (url) window.open(url, "_blank", "noopener");
@@ -353,9 +370,11 @@ function TabManageCycles() {
 
             <div className="grid grid-cols-3 gap-3">
               {[
-                { a: "status" as const, icon: <RefreshCw size={15} />, label: "Change Status", color: "#FF9800", bg: "rgba(255,152,0,0.08)", border: "rgba(255,152,0,0.2)" },
-                { a: "edit"   as const, icon: <Edit3 size={15} />,     label: "Edit Details",  color: "#42A5F5", bg: "rgba(66,165,245,0.08)", border: "rgba(66,165,245,0.2)" },
-                { a: "delete" as const, icon: <Trash2 size={15} />,    label: "Delete Cycle",  color: "#EF5350", bg: "rgba(239,83,80,0.08)",  border: "rgba(239,83,80,0.2)" },
+                { a: "status" as const, icon: <RefreshCw size={15} />,    label: "Change Status",  color: "#FF9800", bg: "rgba(255,152,0,0.08)",   border: "rgba(255,152,0,0.2)" },
+                { a: "edit"   as const, icon: <Edit3 size={15} />,         label: "Edit Details",   color: "#42A5F5", bg: "rgba(66,165,245,0.08)",   border: "rgba(66,165,245,0.2)" },
+                { a: "select" as const, icon: <Trophy size={15} />,        label: "Select Winner",  color: "#FFD700", bg: "rgba(255,215,0,0.07)",    border: "rgba(255,215,0,0.2)" },
+                { a: "agenda" as const, icon: <ListOrdered size={15} />,   label: "Set Agenda",     color: "#66BB6A", bg: "rgba(102,187,106,0.08)",  border: "rgba(102,187,106,0.2)" },
+                { a: "delete" as const, icon: <Trash2 size={15} />,        label: "Delete Cycle",   color: "#EF5350", bg: "rgba(239,83,80,0.08)",    border: "rgba(239,83,80,0.2)" },
               ].map(({ a, icon, label, color, bg, border }) => (
                 <button key={a} onClick={() => setAction(a)}
                   className="rounded-xl p-4 flex flex-col items-center gap-2 text-xs font-bold transition-all"
@@ -423,6 +442,92 @@ function TabManageCycles() {
                   </div>
                 )}
 
+                {action === "select" && (
+                  <div className="rounded-2xl p-6 flex flex-col gap-4" style={{ background: "rgba(255,215,0,0.04)", border: "1px solid rgba(255,215,0,0.2)" }}>
+                    <p className="text-xs font-bold uppercase tracking-widest" style={{ color: "#FFD700" }}>🏆 Select Winning Paper</p>
+                    {!selected?.nominations?.length ? (
+                      <p className="text-sm" style={{ color: "rgba(232,234,246,0.5)" }}>
+                        This cycle has no nominations yet.
+                      </p>
+                    ) : (
+                      <>
+                        <p className="text-xs" style={{ color: "rgba(232,234,246,0.5)" }}>
+                          Click a nomination below or type its ID. All others will be deselected.
+                        </p>
+                        <div className="flex flex-col gap-2">
+                          {selected.nominations.map((nom) => {
+                            const isActive = selectNomId === nom.id;
+                            return (
+                              <button key={nom.id} type="button" onClick={() => setSelectNomId(nom.id)}
+                                className="w-full text-left rounded-xl p-3 transition-all flex items-start gap-3"
+                                style={{
+                                  background: isActive ? "rgba(255,215,0,0.08)" : "rgba(255,255,255,0.03)",
+                                  border: `1px solid ${isActive ? "rgba(255,215,0,0.5)" : "rgba(255,255,255,0.07)"}`,
+                                }}>
+                                <Trophy size={13} className="mt-0.5 shrink-0" style={{ color: isActive ? "#FFD700" : "rgba(232,234,246,0.25)" }} />
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-xs font-bold text-white truncate">{nom.title}</p>
+                                  <p className="text-xs mt-0.5" style={{ color: "rgba(232,234,246,0.4)" }}>
+                                    <span className="font-mono" style={{ color: "#FFD700" }}>{nom.id}</span>
+                                    {" · "}{nom.proposer}
+                                    {nom.votes != null && <> · <strong>{nom.votes}</strong> votes</>}
+                                    {nom.is_selected && <span className="ml-1.5 text-xs font-bold" style={{ color: "#4CAF50" }}>✓ current</span>}
+                                  </p>
+                                </div>
+                              </button>
+                            );
+                          })}
+                        </div>
+                        <Field
+                          label="Nomination ID"
+                          hint="Confirm or override the selection above."
+                          value={selectNomId}
+                          onChange={setSelectNomId}
+                          type="text"
+                          placeholder="e.g. p1"
+                        />
+                      </>
+                    )}
+                  </div>
+                )}
+
+                {action === "agenda" && (
+                  <div className="rounded-2xl p-6 flex flex-col gap-4" style={{ background: "rgba(102,187,106,0.04)", border: "1px solid rgba(102,187,106,0.2)" }}>
+                    <p className="text-xs font-bold uppercase tracking-widest" style={{ color: "#66BB6A" }}>📋 Set Session Agenda</p>
+                    {selected?.session?.agenda?.length ? (
+                      <div className="rounded-xl p-3 flex flex-col gap-1 text-xs" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                        <p className="font-bold mb-1" style={{ color: "rgba(232,234,246,0.5)" }}>Current agenda:</p>
+                        {selected.session.agenda.map((item, i) => (
+                          <p key={i} style={{ color: "rgba(232,234,246,0.6)" }}><span style={{ color: "#66BB6A" }}>{i + 1}.</span> {item}</p>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-xs" style={{ color: "rgba(232,234,246,0.4)" }}>No agenda set yet for this cycle.</p>
+                    )}
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-xs font-bold text-white flex items-center gap-1">
+                        Agenda Items<span style={{ color: "#FF5722" }}>*</span>
+                      </label>
+                      <p className="text-xs" style={{ color: "rgba(232,234,246,0.4)" }}>One item per line. Leading -, *, or • are stripped automatically.</p>
+                      <textarea
+                        value={agendaText}
+                        onChange={(e) => setAgendaText(e.target.value)}
+                        rows={6}
+                        placeholder={"- Paper motivation and background\n- Methodology deep-dive\n- Live demo / code walkthrough\n- Benchmark analysis\n- Open Q&A"}
+                        className="w-full rounded-xl px-4 py-2.5 text-sm outline-none resize-none transition-all font-mono"
+                        style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)", color: "#e8eaf6" }}
+                        onFocus={(e) => (e.currentTarget.style.border = "1px solid rgba(102,187,106,0.5)")}
+                        onBlur={(e)  => (e.currentTarget.style.border = "1px solid rgba(255,255,255,0.12)")}
+                      />
+                      {agendaText && (
+                        <p className="text-xs mt-0.5" style={{ color: "rgba(232,234,246,0.35)" }}>
+                          {agendaText.split("\n").filter(Boolean).length} item(s) detected
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
+
                 <div className="rounded-2xl p-5 flex flex-col gap-3" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
                   <p className="text-xs font-bold uppercase tracking-widest" style={{ color: "rgba(232,234,246,0.35)" }}>Notes (optional)</p>
                   <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} placeholder="Reason for change..."
@@ -439,6 +544,8 @@ function TabManageCycles() {
                     <SubmitBtn>
                       {action === "delete" ? "Open Issue to Delete Cycle" :
                        action === "status" ? "Open Issue to Change Status" :
+                       action === "select" ? "Open Issue to Select Winner" :
+                       action === "agenda" ? "Open Issue to Set Agenda" :
                        "Open Issue to Save Edits"}
                     </SubmitBtn>
                     <p className="text-xs text-center" style={{ color: "rgba(232,234,246,0.35)" }}>
@@ -698,14 +805,115 @@ function TabCrawlPapers() {
 }
 
 /* ════════════════════════════════════════════════════════════
+   TAB 4 — SYNC VOTES
+════════════════════════════════════════════════════════════ */
+function TabSyncVotes() {
+  const activeCycles = cycles.filter((c) => c.status === "active");
+
+  return (
+    <div className="max-w-2xl mx-auto flex flex-col gap-6">
+
+      {/* Explainer */}
+      <div className="rounded-2xl p-6 flex flex-col gap-3"
+        style={{ background: "rgba(255,152,0,0.06)", border: "1px solid rgba(255,152,0,0.2)" }}>
+        <div className="flex items-center gap-2">
+          <RefreshCw size={16} style={{ color: "#FF9800" }} />
+          <p className="text-sm font-bold text-white">How vote sync works</p>
+        </div>
+        <p className="text-sm leading-relaxed" style={{ color: "rgba(232,234,246,0.6)" }}>
+          The bot counts <strong style={{ color: "#e8eaf6" }}>👍 reactions</strong> on each nomination&apos;s GitHub issue and
+          updates <code style={{ color: "#FF9800" }}>cycles.json</code> with the latest counts.
+          It runs automatically <strong style={{ color: "#e8eaf6" }}>every 6 hours</strong> via cron. Use this to trigger
+          an immediate sync — useful during active voting windows.
+        </p>
+        <div className="rounded-xl p-3 flex items-center gap-2 text-xs"
+          style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", color: "rgba(232,234,246,0.5)" }}>
+          <Info size={12} className="shrink-0" style={{ color: "#FF9800" }} />
+          Only nominations with an <strong style={{ color: "#e8eaf6" }}>issue_number</strong> field are synced. Bot-crawled
+          suggestions without a linked issue are counted separately.
+        </div>
+      </div>
+
+      {/* Active cycles with vote summary */}
+      <div className="rounded-2xl p-6 flex flex-col gap-4"
+        style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
+        <p className="text-xs font-bold uppercase tracking-widest" style={{ color: "rgba(232,234,246,0.35)" }}>
+          Active Cycle Vote Status
+        </p>
+        {activeCycles.length === 0 ? (
+          <p className="text-sm" style={{ color: "rgba(232,234,246,0.4)" }}>No active cycles at the moment.</p>
+        ) : activeCycles.map((c) => {
+          const noms = c.nominations ?? [];
+          const synced = noms.filter((n) => (n as { issue_number?: number }).issue_number).length;
+          const totalVotes = noms.reduce((sum, n) => sum + (n.votes ?? 0), 0);
+          const winner = noms.length > 0
+            ? [...noms].sort((a, b) => (b.votes ?? 0) - (a.votes ?? 0))[0]
+            : null;
+          return (
+            <div key={c.id} className="rounded-xl p-4 flex flex-col gap-3"
+              style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
+              <div className="flex items-center justify-between gap-2">
+                <div>
+                  <p className="text-sm font-bold text-white">{cycleLabel(c)}</p>
+                  <p className="text-xs mt-0.5" style={{ color: "rgba(232,234,246,0.4)" }}>{c.theme}</p>
+                </div>
+                <PhaseBadge phaseKey={getPhaseKey(c)} />
+              </div>
+              <div className="grid grid-cols-3 gap-2 text-xs">
+                {[
+                  { label: "Nominations", value: noms.length },
+                  { label: "Synced via issue", value: `${synced} / ${noms.length}` },
+                  { label: "Total votes", value: totalVotes },
+                ].map(({ label, value }) => (
+                  <div key={label} className="rounded-lg p-2 text-center"
+                    style={{ background: "rgba(255,152,0,0.05)", border: "1px solid rgba(255,152,0,0.12)" }}>
+                    <p className="font-bold text-white">{value}</p>
+                    <p style={{ color: "rgba(232,234,246,0.4)" }}>{label}</p>
+                  </div>
+                ))}
+              </div>
+              {winner && (
+                <div className="flex items-center gap-2 text-xs"
+                  style={{ color: "rgba(232,234,246,0.5)" }}>
+                  <Trophy size={11} style={{ color: "#FFD700" }} />
+                  <span>Leading: <strong style={{ color: "#e8eaf6" }}>{winner.title.slice(0, 55)}{winner.title.length > 55 ? "…" : ""}</strong></span>
+                  <span className="ml-auto font-bold" style={{ color: "#FF9800" }}>{winner.votes ?? 0} votes</span>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Trigger button */}
+      <div className="flex flex-col gap-3">
+        <a
+          href={`https://github.com/${REPO}/actions/workflows/sync-votes.yml`}
+          target="_blank" rel="noopener noreferrer"
+          className="w-full font-bold py-4 rounded-2xl text-sm flex items-center justify-center gap-2 transition-all"
+          style={{ background: "rgba(255,152,0,0.12)", border: "1px solid rgba(255,152,0,0.4)", color: "#FFCC80", textDecoration: "none" }}>
+          <PlayCircle size={16} />
+          Open GitHub Actions — Trigger Vote Sync
+          <ExternalLink size={14} />
+        </a>
+        <p className="text-xs text-center" style={{ color: "rgba(232,234,246,0.35)" }}>
+          Click <strong style={{ color: "#e8eaf6" }}>&ldquo;Run workflow&rdquo;</strong> on the page that opens. The bot syncs all active cycles, commits updated vote counts, and redeploys the site in ~2 min.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/* ════════════════════════════════════════════════════════════
    ROOT PAGE
 ════════════════════════════════════════════════════════════ */
-type Tab = "cycles" | "dates" | "crawl";
+type Tab = "cycles" | "dates" | "crawl" | "sync";
 
 const TABS: { id: Tab; label: string; icon: React.ReactNode; desc: string }[] = [
-  { id: "cycles", label: "Manage Cycles", icon: <LayoutGrid size={16} />, desc: "Change status, edit theme, or delete" },
-  { id: "dates",  label: "Set Dates",     icon: <Calendar size={16} />,   desc: "Exploration & Deep Dive dates for a cycle" },
-  { id: "crawl",  label: "Crawl Papers",  icon: <Search size={16} />,     desc: "Fetch suggestions for a cycle or seed pool" },
+  { id: "cycles", label: "Manage Cycles", icon: <LayoutGrid size={16} />,   desc: "Status, edit, select winner, set agenda" },
+  { id: "dates",  label: "Set Dates",     icon: <Calendar size={16} />,     desc: "Exploration & Deep Dive dates" },
+  { id: "crawl",  label: "Crawl Papers",  icon: <Search size={16} />,       desc: "Fetch suggestions for a cycle or seed pool" },
+  { id: "sync",   label: "Sync Votes",    icon: <RefreshCw size={16} />,    desc: "Trigger vote count update from GitHub reactions" },
 ];
 
 export default function AdminPage() {
@@ -740,7 +948,7 @@ export default function AdminPage() {
       </section>
 
       <div className="max-w-5xl mx-auto px-6 w-full mb-8">
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-4 gap-3">
           {TABS.map((t) => (
             <button key={t.id} onClick={() => setTab(t.id)}
               className="rounded-2xl p-5 text-left transition-all"
@@ -765,6 +973,7 @@ export default function AdminPage() {
         {tab === "dates"  && <TabSetDates />}
         {tab === "cycles" && <TabManageCycles />}
         {tab === "crawl"  && <TabCrawlPapers />}
+        {tab === "sync"   && <TabSyncVotes />}
       </div>
     </div>
   );

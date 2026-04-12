@@ -11,7 +11,7 @@ const path = require("path");
 const { parseIssueBody } = require("./lib/parse-issue");
 
 const VALID_STATUSES = ["planned", "active", "archived"];
-const VALID_ACTIONS  = ["status", "edit", "delete"];
+const VALID_ACTIONS  = ["status", "edit", "delete", "select", "agenda"];
 
 async function main() {
   const issueBody = process.env.ISSUE_BODY;
@@ -20,12 +20,14 @@ async function main() {
   const fields = parseIssueBody(issueBody);
   console.log("📋 Parsed fields:", JSON.stringify(fields, null, 2));
 
-  const cycleId = (fields["cycle id"] || "").trim();
-  const action  = (fields["action"] || "").toLowerCase().trim();
+  const cycleId   = (fields["cycle id"] || "").trim();
+  const action    = (fields["action"] || "").toLowerCase().trim();
   const newStatus = (fields["new status (for status action)"] || fields["new status"] || "").toLowerCase().trim();
   const newTheme  = (fields["new theme (for edit action)"] || fields["new theme"] || "").trim();
   const newMonth  = (fields["new month (for edit action)"] || fields["new month"] || "").trim();
   const newYear   = (fields["new year (for edit action)"] || fields["new year"] || "").trim();
+  const selectId  = (fields["nomination id (for select action)"] || fields["nomination id"] || "").trim();
+  const agendaRaw = (fields["agenda items (for agenda action, one per line)"] || fields["agenda items"] || "").trim();
   const notes     = (fields["notes (optional)"] || fields["notes"] || "").trim();
 
   if (!cycleId) { console.error("❌ Cycle ID is required."); process.exit(1); }
@@ -98,6 +100,54 @@ async function main() {
     cycles.splice(idx, 1);
     summary = `## 🗑️ Cycle Deleted\n\n**Cycle:** \`${cycleId}\`\n\n> Cycle was in \`planned\` status with no nominations.\n${notes ? `\n**Notes:** ${notes}` : ""}`;
     console.log(`🗑️  Deleted planned cycle: ${cycleId}`);
+  }
+
+  // ── Action: select ────────────────────────────────────────────
+  else if (action === "select") {
+    if (!selectId) {
+      console.error("❌ Nomination ID is required for the 'select' action.");
+      process.exit(1);
+    }
+    if (!cycle.nominations || cycle.nominations.length === 0) {
+      console.error(`❌ Cycle "${cycleId}" has no nominations.`);
+      process.exit(1);
+    }
+    const nomIdx = cycle.nominations.findIndex(
+      (n) => n.id === selectId || n.title?.toLowerCase().includes(selectId.toLowerCase())
+    );
+    if (nomIdx === -1) {
+      const ids = cycle.nominations.map((n) => n.id).join(", ");
+      console.error(`❌ Nomination "${selectId}" not found. Available IDs: ${ids}`);
+      process.exit(1);
+    }
+    // Deselect all, then select the target
+    cycle.nominations.forEach((n) => { n.is_selected = false; });
+    cycle.nominations[nomIdx].is_selected = true;
+    const winner = cycle.nominations[nomIdx];
+    summary = `## 🏆 Winning Paper Selected\n\n| Field | Value |\n|---|---|\n| Cycle | \`${cycleId}\` |\n| Selected | \`${winner.id}\` |\n| Title | ${winner.title} |\n| Proposer | ${winner.proposer || "—"} |\n| Votes | ${winner.votes ?? "—"} |\n${notes ? `| Notes | ${notes} |` : ""}`;
+    console.log(`🏆 ${cycleId}: selected nomination "${winner.id}" — ${winner.title}`);
+  }
+
+  // ── Action: agenda ────────────────────────────────────────────
+  else if (action === "agenda") {
+    if (!agendaRaw) {
+      console.error("❌ Agenda items are required for the 'agenda' action.");
+      process.exit(1);
+    }
+    const agendaItems = agendaRaw
+      .split("\n")
+      .map((l) => l.replace(/^[-*•]\s*/, "").trim())
+      .filter(Boolean);
+    if (agendaItems.length === 0) {
+      console.error("❌ No agenda items parsed from input.");
+      process.exit(1);
+    }
+    if (!cycle.session) cycle.session = { date: "", presenter: "", presenter_role: "", agenda: [] };
+    cycle.session.agenda = agendaItems;
+    const list = agendaItems.map((item, i) => `${i + 1}. ${item}`).join("\n");
+    summary = `## 📋 Session Agenda Set\n\n**Cycle:** \`${cycleId}\`\n\n**Agenda (${agendaItems.length} items):**\n${list}\n${notes ? `\n**Notes:** ${notes}` : ""}`;
+    console.log(`📋 ${cycleId}: agenda set with ${agendaItems.length} item(s)`);
+    agendaItems.forEach((item, i) => console.log(`  ${i + 1}. ${item}`));
   }
 
   // ── Write back ────────────────────────────────────────────────
