@@ -497,23 +497,38 @@ export default function SeedsPage() {
           </div>
 
           {/* Stats strip */}
-          <div className="flex flex-wrap gap-8 mt-8">
-            <div>
-              <div className="text-2xl font-black" style={{ color: "#FF5722" }}>{activeCycles.length}</div>
-              <div className="text-xs mt-0.5" style={{ color: "rgba(232,234,246,0.4)" }}>Active Cycles</div>
+          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mt-8">
+            <div className="flex flex-wrap gap-8">
+              <div>
+                <div className="text-2xl font-black" style={{ color: "#FF5722" }}>{activeCycles.length}</div>
+                <div className="text-xs mt-0.5" style={{ color: "rgba(232,234,246,0.4)" }}>Active Cycles</div>
+              </div>
+              <div>
+                <div className="text-2xl font-black" style={{ color: "#FF5722" }}>{totalNoms}</div>
+                <div className="text-xs mt-0.5" style={{ color: "rgba(232,234,246,0.4)" }}>Nominations</div>
+              </div>
+              <div>
+                <div className="text-2xl font-black" style={{ color: "#FF5722" }}>{totalVotes}</div>
+                <div className="text-xs mt-0.5" style={{ color: "rgba(232,234,246,0.4)" }}>Total Votes Cast</div>
+              </div>
+              <div>
+                <div className="text-2xl font-black" style={{ color: "#FF5722" }}>{plannedCycles.length}</div>
+                <div className="text-xs mt-0.5" style={{ color: "rgba(232,234,246,0.4)" }}>Cycles Planned</div>
+              </div>
             </div>
-            <div>
-              <div className="text-2xl font-black" style={{ color: "#FF5722" }}>{totalNoms}</div>
-              <div className="text-xs mt-0.5" style={{ color: "rgba(232,234,246,0.4)" }}>Nominations</div>
-            </div>
-            <div>
-              <div className="text-2xl font-black" style={{ color: "#FF5722" }}>{totalVotes}</div>
-              <div className="text-xs mt-0.5" style={{ color: "rgba(232,234,246,0.4)" }}>Total Votes Cast</div>
-            </div>
-            <div>
-              <div className="text-2xl font-black" style={{ color: "#FF5722" }}>{plannedCycles.length}</div>
-              <div className="text-xs mt-0.5" style={{ color: "rgba(232,234,246,0.4)" }}>Cycles Planned</div>
-            </div>
+            <a
+              href="https://github.com/vominhduc/vjai-paper-hub/issues/new?labels=seed&template=01-propose-seed.yml"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold px-5 py-2.5 rounded-full text-sm inline-flex items-center gap-2 self-start lg:self-auto"
+              style={{
+                background: "rgba(76,175,80,0.08)",
+                color: "#66BB6A",
+                border: "1px solid rgba(76,175,80,0.25)",
+              }}
+            >
+              <Sprout size={14} /> Propose a Seed Paper
+            </a>
           </div>
         </div>
       </section>
@@ -648,6 +663,19 @@ export default function SeedsPage() {
             Join the community and make your voice count.
           </p>
           <div className="flex flex-wrap gap-3 justify-center">
+            <a
+              href="https://github.com/vominhduc/vjai-paper-hub/issues/new?labels=seed&template=01-propose-seed.yml"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold px-6 py-3 rounded-full text-sm inline-flex items-center gap-2"
+              style={{
+                background: "rgba(76,175,80,0.08)",
+                color: "#66BB6A",
+                border: "1px solid rgba(76,175,80,0.25)",
+              }}
+            >
+              <Sprout size={14} /> Propose a Seed Paper
+            </a>
             <a
               href={
                 `https://github.com/vominhduc/vjai-paper-hub/issues/new` +

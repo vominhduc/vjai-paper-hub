@@ -68,8 +68,8 @@ async function main() {
     process.exit(1);
   }
 
-  // Mark cycle as completed
-  cycle.status = "completed";
+  // Mark cycle as archived
+  cycle.status = "archived";
   fs.writeFileSync(cyclesPath, JSON.stringify(cycles, null, 2) + "\n");
   console.log(`✅ Cycle "${cycleId}" marked as completed.`);
 

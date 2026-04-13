@@ -905,13 +905,154 @@ function TabSyncVotes() {
 }
 
 /* ════════════════════════════════════════════════════════════
+   TAB 5 — OPEN CYCLE
+════════════════════════════════════════════════════════════ */
+function TabOpenCycle() {
+  const [cycleId, setCycleId]         = useState("");
+  const [month, setMonth]             = useState("");
+  const [year, setYear]               = useState(new Date().getFullYear().toString());
+  const [theme, setTheme]             = useState("");
+  const [sessionDate, setSessionDate] = useState("");
+  const [presenter, setPresenter]     = useState("");
+  const [presenterRole, setPresenterRole] = useState("");
+  const [error, setError]             = useState("");
+
+  // Auto-suggest cycle ID from month+year
+  const suggestedId = month && year
+    ? `${year}-${month.toLowerCase().slice(0, 3)}`
+    : "";
+
+  function validate() {
+    if (!cycleId.trim())  { setError("Cycle ID is required (e.g. 2026-jan)."); return false; }
+    if (!/^\d{4}-[a-z]{3}$/.test(cycleId.trim())) { setError("Cycle ID must be in the format YYYY-mmm (e.g. 2026-jan)."); return false; }
+    if (!theme.trim())    { setError("Theme is required."); return false; }
+    if (cycles.some((c) => c.id === cycleId.trim())) { setError(`Cycle "${cycleId}" already exists.`); return false; }
+    setError(""); return true;
+  }
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!validate()) return;
+    const title = `Open Cycle: ${cycleId.trim()}`;
+    const body = [
+      `### Cycle ID`, cycleId.trim(), ``,
+      `### Month`, month || "_No response_", ``,
+      `### Year`, year || "_No response_", ``,
+      `### Theme`, theme.trim(), ``,
+      `### Session Date (YYYY-MM-DD, optional)`, sessionDate || "_No response_", ``,
+      `### Presenter (optional)`, presenter || "_No response_", ``,
+      `### Presenter Role (optional)`, presenterRole || "_No response_",
+    ].join("\n");
+    const params = new URLSearchParams({ template: "04-new-cycle.yml", title, labels: "new-cycle,cycle", body });
+    window.open(`https://github.com/${REPO}/issues/new?${params}`, "_blank", "noopener");
+  }
+
+  const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+  return (
+    <div className="max-w-2xl mx-auto flex flex-col gap-6">
+      {/* Info banner */}
+      <div className="rounded-2xl p-5 flex flex-col gap-3"
+        style={{ background: "rgba(66,165,245,0.06)", border: "1px solid rgba(66,165,245,0.2)" }}>
+        <div className="flex items-center gap-2">
+          <Info size={15} style={{ color: "#42A5F5" }} />
+          <p className="text-sm font-bold text-white">How this works</p>
+        </div>
+        <p className="text-sm leading-relaxed" style={{ color: "rgba(232,234,246,0.6)" }}>
+          Opening a GitHub issue with the <code style={{ color: "#42A5F5" }}>new-cycle</code> label triggers the bot to
+          add a new entry to <code style={{ color: "#42A5F5" }}>cycles.json</code> and redeploy the site in ~2 min.
+          Dates can be set later via the <strong style={{ color: "#e8eaf6" }}>Set Dates</strong> tab.
+        </p>
+      </div>
+
+      <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+        {/* Cycle ID */}
+        <div className="rounded-2xl p-6 flex flex-col gap-5"
+          style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
+          <p className="text-xs font-bold uppercase tracking-widest" style={{ color: "rgba(232,234,246,0.35)" }}>
+            Identity
+          </p>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-bold text-white flex items-center gap-1">
+                Month<span style={{ color: "#FF5722" }}>*</span>
+              </label>
+              <select
+                value={month}
+                onChange={(e) => {
+                  setMonth(e.target.value);
+                  const abbr = e.target.value.toLowerCase().slice(0, 3);
+                  if (year) setCycleId(`${year}-${abbr}`);
+                }}
+                className="w-full rounded-xl px-4 py-2.5 text-sm font-medium outline-none transition-all"
+                style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)", color: "#e8eaf6", colorScheme: "dark" }}
+                onFocus={(e) => (e.currentTarget.style.border = "1px solid rgba(255,87,34,0.5)")}
+                onBlur={(e)  => (e.currentTarget.style.border = "1px solid rgba(255,255,255,0.12)")}
+              >
+                <option value="">Select month…</option>
+                {MONTHS.map((m) => <option key={m} value={m}>{m}</option>)}
+              </select>
+            </div>
+            <Field label="Year" value={year} onChange={(v) => {
+              setYear(v);
+              if (month) setCycleId(`${v}-${month.toLowerCase().slice(0, 3)}`);
+            }} type="number" placeholder="e.g. 2026" />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-bold text-white flex items-center gap-1">
+              Cycle ID<span style={{ color: "#FF5722" }}>*</span>
+            </label>
+            <p className="text-xs" style={{ color: "rgba(232,234,246,0.4)" }}>
+              Auto-filled from month + year. Format: YYYY-mmm (e.g. 2026-jan)
+            </p>
+            <input
+              type="text" value={cycleId} placeholder="e.g. 2026-jan"
+              onChange={(e) => setCycleId(e.target.value.toLowerCase())}
+              className="w-full rounded-xl px-4 py-2.5 text-sm font-medium outline-none transition-all font-mono"
+              style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)", color: "#e8eaf6" }}
+              onFocus={(e) => (e.currentTarget.style.border = "1px solid rgba(255,87,34,0.5)")}
+              onBlur={(e)  => (e.currentTarget.style.border = "1px solid rgba(255,255,255,0.12)")}
+            />
+            {suggestedId && suggestedId !== cycleId && (
+              <button type="button" onClick={() => setCycleId(suggestedId)}
+                className="text-xs self-start font-semibold" style={{ color: "#FF5722" }}>
+                Use suggested: {suggestedId}
+              </button>
+            )}
+          </div>
+          <Field label="Theme" hint="A short label for this cycle's focus area." value={theme} onChange={setTheme} type="text" placeholder="e.g. Efficient Transformers" />
+        </div>
+
+        {/* Optional dates & presenter */}
+        <div className="rounded-2xl p-6 flex flex-col gap-5"
+          style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
+          <p className="text-xs font-bold uppercase tracking-widest" style={{ color: "rgba(232,234,246,0.35)" }}>
+            Dates & Presenter <span className="normal-case font-normal" style={{ color: "rgba(232,234,246,0.35)" }}>(optional — can be set later)</span>
+          </p>
+          <Field label="Deep Dive Session Date" value={sessionDate} onChange={setSessionDate} required={false} />
+          <Field label="Presenter Name" value={presenter} onChange={setPresenter} type="text" required={false} placeholder="e.g. Duc Vo" />
+          <Field label="Presenter Role" value={presenterRole} onChange={setPresenterRole} type="text" required={false} placeholder="e.g. ML Engineer · VJAI Core" />
+        </div>
+
+        {error && <ErrorBanner msg={error} />}
+        <SubmitBtn>Open GitHub Issue to Create Cycle</SubmitBtn>
+        <p className="text-xs text-center" style={{ color: "rgba(232,234,246,0.35)" }}>
+          Opens a pre-filled GitHub issue with the <code>new-cycle</code> label. The bot adds the cycle and redeploys in ~2 min.
+        </p>
+      </form>
+    </div>
+  );
+}
+
+/* ════════════════════════════════════════════════════════════
    ROOT PAGE
 ════════════════════════════════════════════════════════════ */
-type Tab = "cycles" | "dates" | "crawl" | "sync";
+type Tab = "cycles" | "dates" | "crawl" | "sync" | "open";
 
 const TABS: { id: Tab; label: string; icon: React.ReactNode; desc: string }[] = [
   { id: "cycles", label: "Manage Cycles", icon: <LayoutGrid size={16} />,   desc: "Status, edit, select winner, set agenda" },
   { id: "dates",  label: "Set Dates",     icon: <Calendar size={16} />,     desc: "Exploration & Deep Dive dates" },
+  { id: "open",   label: "Open Cycle",    icon: <PlayCircle size={16} />,   desc: "Create a new cycle on the roadmap" },
   { id: "crawl",  label: "Crawl Papers",  icon: <Search size={16} />,       desc: "Fetch suggestions for a cycle or seed pool" },
   { id: "sync",   label: "Sync Votes",    icon: <RefreshCw size={16} />,    desc: "Trigger vote count update from GitHub reactions" },
 ];
@@ -948,7 +1089,7 @@ export default function AdminPage() {
       </section>
 
       <div className="max-w-5xl mx-auto px-6 w-full mb-8">
-        <div className="grid grid-cols-4 gap-3">
+        <div className="grid grid-cols-5 gap-3">
           {TABS.map((t) => (
             <button key={t.id} onClick={() => setTab(t.id)}
               className="rounded-2xl p-5 text-left transition-all"
@@ -972,6 +1113,7 @@ export default function AdminPage() {
       <div className="max-w-5xl mx-auto px-6 pb-32 w-full">
         {tab === "dates"  && <TabSetDates />}
         {tab === "cycles" && <TabManageCycles />}
+        {tab === "open"   && <TabOpenCycle />}
         {tab === "crawl"  && <TabCrawlPapers />}
         {tab === "sync"   && <TabSyncVotes />}
       </div>

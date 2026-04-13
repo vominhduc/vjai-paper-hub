@@ -114,7 +114,6 @@ function NominationCard({
 
       <p className="text-xs" style={{ color: "rgba(232,234,246,0.45)" }}>
         Proposed by <span style={{ color: "#FF7043" }}>{nom.proposer}</span>
-        <span style={{ color: "rgba(232,234,246,0.3)" }}> · presenter</span>
       </p>
 
       {/* Vote bar */}
@@ -253,6 +252,11 @@ function DeepDiveSpotlight({ cycle }: { cycle: Cycle }) {
           >
             Session Agenda
           </p>
+          {cycle.session.agenda.length === 0 ? (
+            <p className="text-sm italic" style={{ color: "rgba(232,234,246,0.3)" }}>
+              Agenda will be posted once the winning paper is confirmed.
+            </p>
+          ) : (
           <div className="flex flex-col gap-3">
             {cycle.session.agenda.map((item, i) => (
               <div key={i} className="flex gap-3 items-start">
@@ -268,6 +272,7 @@ function DeepDiveSpotlight({ cycle }: { cycle: Cycle }) {
               </div>
             ))}
           </div>
+          )}
         </div>
 
         <div className="flex gap-3">
@@ -534,6 +539,7 @@ function CyclePageInner() {
   const resolvedId = cycles.find((c) => c.id === paramCycleId)?.id ?? defaultCycleId;
 
   const [activeCycleId, setActiveCycleId] = useState<string>(resolvedId);
+  const [showPlanned, setShowPlanned] = useState(false);
 
   // Sync whenever the query param changes (Next.js client-side nav)
   useEffect(() => {
@@ -594,30 +600,73 @@ function CyclePageInner() {
             </div>
 
             {/* Cycle selector */}
-            <div className="flex flex-wrap gap-2">
-              {cycles.map((c) => {
-                const isActive = activeCycleId === c.id;
-                const cPhase = getCyclePhase(c);
-                const dot =
-                  c.status === "active" ? "#FF5722"
-                  : cPhase === "archived" ? "#4CAF50"
-                  : "#42A5F5";
-                return (
+            <div className="flex flex-wrap gap-2 items-center">
+              {cycles
+                .filter((c) => c.status !== "planned" || c.exploration_start || c.session_date)
+                .map((c) => {
+                  const isActive = activeCycleId === c.id;
+                  const cPhase = getCyclePhase(c);
+                  const dot =
+                    c.status === "active" ? "#FF5722"
+                    : cPhase === "archived" ? "#4CAF50"
+                    : "#42A5F5";
+                  return (
+                    <button
+                      key={c.id}
+                      onClick={() => setActiveCycleId(c.id)}
+                      className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all duration-200"
+                      style={
+                        isActive
+                          ? { background: "rgba(255,87,34,0.2)", color: "#FF5722", border: "1px solid rgba(255,87,34,0.5)" }
+                          : { background: "rgba(255,255,255,0.04)", color: "rgba(232,234,246,0.5)", border: "1px solid rgba(255,255,255,0.08)" }
+                      }
+                    >
+                      <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: dot }} />
+                      {cycleLabel(c)}
+                    </button>
+                  );
+                })}
+              {(() => {
+                const undated = cycles.filter((c) => c.status === "planned" && !c.exploration_start && !c.session_date);
+                if (undated.length === 0) return null;
+                return showPlanned ? (
+                  <>
+                    {undated.map((c) => {
+                      const isActive = activeCycleId === c.id;
+                      return (
+                        <button
+                          key={c.id}
+                          onClick={() => setActiveCycleId(c.id)}
+                          className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all duration-200"
+                          style={
+                            isActive
+                              ? { background: "rgba(255,87,34,0.2)", color: "#FF5722", border: "1px solid rgba(255,87,34,0.5)" }
+                              : { background: "rgba(255,255,255,0.02)", color: "rgba(232,234,246,0.3)", border: "1px dashed rgba(255,255,255,0.1)" }
+                          }
+                        >
+                          <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: "#42A5F5", opacity: 0.5 }} />
+                          {cycleLabel(c)}
+                        </button>
+                      );
+                    })}
+                    <button
+                      onClick={() => setShowPlanned(false)}
+                      className="px-3 py-2 rounded-xl text-xs font-bold transition-all duration-200"
+                      style={{ color: "rgba(232,234,246,0.3)", border: "1px dashed rgba(255,255,255,0.08)" }}
+                    >
+                      Hide ↑
+                    </button>
+                  </>
+                ) : (
                   <button
-                    key={c.id}
-                    onClick={() => setActiveCycleId(c.id)}
-                    className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all duration-200"
-                    style={
-                      isActive
-                        ? { background: "rgba(255,87,34,0.2)", color: "#FF5722", border: "1px solid rgba(255,87,34,0.5)" }
-                        : { background: "rgba(255,255,255,0.04)", color: "rgba(232,234,246,0.5)", border: "1px solid rgba(255,255,255,0.08)" }
-                    }
+                    onClick={() => setShowPlanned(true)}
+                    className="px-3 py-2 rounded-xl text-xs font-bold transition-all duration-200"
+                    style={{ color: "rgba(66,165,245,0.6)", border: "1px dashed rgba(66,165,245,0.2)", background: "rgba(66,165,245,0.04)" }}
                   >
-                    <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: dot }} />
-                    {cycleLabel(c)}
+                    +{undated.length} planned
                   </button>
                 );
-              })}
+              })()}
             </div>
           </div>
 

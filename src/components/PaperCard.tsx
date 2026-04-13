@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ExternalLink, GitFork, Play, BookOpen, Code2 } from "lucide-react";
 import type { ArchivePaper } from "@/lib/data";
 
@@ -46,7 +47,9 @@ export default function PaperCard({ paper }: { paper: ArchivePaper }) {
         <p className="text-xs mb-1" style={{ color: "rgba(232,234,246,0.4)" }}>
           {paper.conference} {paper.year} · {paper.presenter}
         </p>
-        <h3 className="text-sm font-bold text-white leading-snug">{paper.title}</h3>
+        <Link href={`/archive/${paper.id}`} className="hover:underline underline-offset-2">
+          <h3 className="text-sm font-bold text-white leading-snug">{paper.title}</h3>
+        </Link>
       </div>
 
       {/* TL;DR */}
@@ -60,7 +63,7 @@ export default function PaperCard({ paper }: { paper: ArchivePaper }) {
       </ul>
 
       {/* Vibe score */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3" title="Hackability score: how feasible it is to reproduce or extend this paper in a weekend hackathon (0–100)">
         <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.07)" }}>
           <div
             className="h-full rounded-full"

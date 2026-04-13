@@ -128,17 +128,34 @@ export default function RoadmapPage() {
                     <span className="text-xs" style={{ color: "rgba(232,234,246,0.5)" }}>
                       Presenter: <strong className="text-white">{cycle.session.presenter || "TBA"}</strong>
                     </span>
-                    <Link
-                      href={`/cycle?cycle=${cycle.id}`}
-                      className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full transition-all"
-                      style={{
-                        color: "#FF5722",
-                        border: "1px solid rgba(255,87,34,0.35)",
-                        background: "rgba(255,87,34,0.07)",
-                      }}
-                    >
-                      View Details <ArrowRight size={11} />
-                    </Link>
+                    <div className="flex items-center gap-2">
+                      {isActive && getCyclePhase(cycle) === "nominating" && (
+                        <a
+                          href={`https://github.com/vominhduc/vjai-paper-hub/issues/new?labels=nomination&template=02-nominate-cycle.yml&cycle_id=${encodeURIComponent(cycle.id)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full transition-all"
+                          style={{
+                            color: "#FF9800",
+                            border: "1px solid rgba(255,152,0,0.35)",
+                            background: "rgba(255,152,0,0.07)",
+                          }}
+                        >
+                          Nominate
+                        </a>
+                      )}
+                      <Link
+                        href={`/cycle?cycle=${cycle.id}`}
+                        className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full transition-all"
+                        style={{
+                          color: "#FF5722",
+                          border: "1px solid rgba(255,87,34,0.35)",
+                          background: "rgba(255,87,34,0.07)",
+                        }}
+                      >
+                        View Details <ArrowRight size={11} />
+                      </Link>
+                    </div>
                   </div>
                 </div>
               );

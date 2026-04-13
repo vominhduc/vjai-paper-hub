@@ -9,7 +9,7 @@ export interface SiteStats {
   ossRepos: number;
 }
 
-export const siteStats: SiteStats = siteData.stats;
+// Declared below after archiveData is used — keeps papersDigested in sync automatically.
 
 export interface Nomination {
   id: string;
@@ -121,6 +121,12 @@ export interface SeedPaper {
 export const cycles = cyclesData as Cycle[];
 export const archive = archiveData as ArchivePaper[];
 export const seeds   = seedsData as SeedPaper[];
+
+// Auto-compute papersDigested from live archive length so stats never drift
+export const siteStats: SiteStats = {
+  ...siteData.stats,
+  papersDigested: archiveData.length,
+};
 
 
 
