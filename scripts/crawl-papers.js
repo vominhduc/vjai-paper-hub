@@ -2,9 +2,11 @@
 // scripts/crawl-papers.js
 // Triggered by: GitHub Actions workflow_dispatch
 //
-// Two modes:
+// Four modes:
 //   MODE=conference  — fetch highly-cited papers from a conference venue (post-proceedings)
 //   MODE=topic       — search arXiv/Semantic Scholar by keyword (pre-conference or any time)
+//   MODE=arxiv       — fetch one specific paper by arXiv ID or URL (e.g. 2106.09685)
+//   MODE=author      — fetch recent papers from a specific researcher by name or S2 author ID
 //
 // Target: papers are added as organizer suggestions (nominations) to a specific CYCLE_ID,
 // OR appended to seeds.json when no CYCLE_ID is provided.
@@ -97,16 +99,18 @@ async function fetchWithRetry(url, opts = {}, retries = 3) {
 }
 
 async function main() {
-  const mode       = (process.env.MODE || "conference").toLowerCase().trim(); // "conference" | "topic"
+  const mode       = (process.env.MODE || "conference").toLowerCase().trim(); // "conference" | "topic" | "arxiv" | "author"
   const cycleId    = (process.env.CYCLE_ID || "").trim();
   const conference = (process.env.CONFERENCE || "").toUpperCase().trim();
   const year       = parseInt(process.env.YEAR || String(new Date().getFullYear()), 10);
   const topic      = (process.env.TOPIC || "").trim();        // free-text keyword (topic mode)
+  const arxivInput = (process.env.ARXIV_ID || "").trim();     // arxiv mode: ID or full URL
+  const authorInput= (process.env.AUTHOR || "").trim();       // author mode: name or S2 author ID
   const limit      = parseInt(process.env.LIMIT || "15", 10);
-  const minCites   = parseInt(process.env.MIN_CITATIONS || "0", 10); // topic mode default: no floor
+  const minCites   = parseInt(process.env.MIN_CITATIONS || "0", 10);
 
-  if (mode !== "conference" && mode !== "topic") {
-    console.error(`❌ MODE must be "conference" or "topic" (got "${mode}")`);
+  if (!["conference", "topic", "arxiv", "author"].includes(mode)) {
+    console.error(`❌ MODE must be "conference", "topic", "arxiv", or "author" (got "${mode}")`);
     process.exit(1);
   }
   if (mode === "conference" && !conference) {
@@ -117,7 +121,14 @@ async function main() {
     console.error("❌ TOPIC env var required in topic mode (e.g. 'reasoning LLM', 'diffusion models')");
     process.exit(1);
   }
-
+  if (mode === "arxiv" && !arxivInput) {
+    console.error("❌ ARXIV_ID env var required in arxiv mode (e.g. '2106.09685' or full arXiv URL)");
+    process.exit(1);
+  }
+  if (mode === "author" && !authorInput) {
+    console.error("❌ AUTHOR env var required in author mode (e.g. 'Andrej Karpathy' or S2 author ID)");
+    process.exit(1);
+  }
   // ── Load cycles.json ──────────────────────────────────────────
   const cyclesPath = path.resolve(__dirname, "../data/cycles.json");
   const cycles = JSON.parse(fs.readFileSync(cyclesPath, "utf8"));
@@ -132,42 +143,107 @@ async function main() {
     console.log(`🎯 Target cycle: ${cycleId} — "${targetCycle.theme}"`);
   }
 
-  // ── Build search query ────────────────────────────────────────
-  let searchQuery, logLabel;
-  if (mode === "conference") {
-    searchQuery = `${conference} ${year}`;
-    logLabel    = `${conference} ${year}`;
-    console.log(`🔍 [conference mode] Crawling ${logLabel} — top ${limit} papers (min ${minCites} citations)`);
-  } else {
-    searchQuery = topic;
-    logLabel    = `topic: "${topic}"`;
-    console.log(`🔍 [topic mode] Crawling "${topic}" — top ${limit} papers sorted by recency`);
-  }
-
-  // ── Query Semantic Scholar ────────────────────────────────────
-  const ssParams = new URLSearchParams({
-    query:  searchQuery,
-    fields: FIELDS,
-    limit:  String(Math.min(limit * 5, 100)), // over-fetch; we'll filter & slice
-  });
-  // In conference mode: filter by year, sort by citations
-  // In topic mode: sort by year desc (recent arXiv papers), no year filter
-  if (mode === "conference") {
-    ssParams.set("year", `${year}`);
-    ssParams.set("sort", "citationCount:desc");
-  } else {
-    ssParams.set("sort", "year:desc");
-  }
-
+  // ── Fetch papers based on mode ───────────────────────────────
   let papers = [];
-  try {
-    const res  = await fetchWithRetry(`${API_BASE}/paper/search?${ssParams}`);
-    const data = await res.json();
-    papers = data.data || [];
-    console.log(`📦 Received ${papers.length} results from Semantic Scholar`);
-  } catch (err) {
-    console.error("❌ Semantic Scholar search failed:", err.message);
-    process.exit(1);
+  let logLabel = "";
+
+  if (mode === "conference" || mode === "topic") {
+    let searchQuery;
+    if (mode === "conference") {
+      searchQuery = `${conference} ${year}`;
+      logLabel    = `${conference} ${year}`;
+      console.log(`🔍 [conference mode] Crawling ${logLabel} — top ${limit} papers (min ${minCites} citations)`);
+    } else {
+      searchQuery = topic;
+      logLabel    = `topic: "${topic}"`;
+      console.log(`🔍 [topic mode] Crawling "${topic}" — top ${limit} papers sorted by recency`);
+    }
+
+    const ssParams = new URLSearchParams({
+      query:  searchQuery,
+      fields: FIELDS,
+      limit:  String(Math.min(limit * 5, 100)),
+    });
+    if (mode === "conference") {
+      ssParams.set("year", `${year}`);
+      ssParams.set("sort", "citationCount:desc");
+    } else {
+      ssParams.set("sort", "year:desc");
+    }
+
+    try {
+      const res  = await fetchWithRetry(`${API_BASE}/paper/search?${ssParams}`);
+      const data = await res.json();
+      papers = data.data || [];
+      console.log(`📦 Received ${papers.length} results from Semantic Scholar`);
+    } catch (err) {
+      console.error("❌ Semantic Scholar search failed:", err.message);
+      process.exit(1);
+    }
+
+  } else if (mode === "arxiv") {
+    // ── ArXiv ID mode: fetch a single specific paper ──────────
+    // Accept full URLs like https://arxiv.org/abs/2106.09685 or bare IDs
+    const arxivId = arxivInput.replace(/.*abs\//, "").replace(/v\d+$/, "").trim();
+    logLabel = `arXiv:${arxivId}`;
+    console.log(`🔍 [arxiv mode] Fetching paper arXiv:${arxivId}`);
+
+    try {
+      const res  = await fetchWithRetry(`${API_BASE}/paper/arXiv:${arxivId}?fields=${FIELDS}`);
+      const data = await res.json();
+      if (data.error || !data.title) {
+        console.error(`❌ Paper arXiv:${arxivId} not found on Semantic Scholar.`);
+        process.exit(1);
+      }
+      papers = [data];
+      console.log(`📦 Found: "${data.title}"`);
+    } catch (err) {
+      console.error("❌ Semantic Scholar lookup failed:", err.message);
+      process.exit(1);
+    }
+
+  } else if (mode === "author") {
+    // ── Author mode: fetch recent papers by a specific researcher ──
+    logLabel = `author: "${authorInput}"`;
+    console.log(`🔍 [author mode] Fetching recent papers by "${authorInput}" — top ${limit}`);
+
+    // Step 1: resolve author (name → S2 author ID, or use bare numeric ID directly)
+    let authorId = null;
+    if (/^\d+$/.test(authorInput)) {
+      authorId = authorInput; // already an S2 author ID
+    } else {
+      try {
+        const searchRes  = await fetchWithRetry(
+          `${API_BASE}/author/search?query=${encodeURIComponent(authorInput)}&fields=authorId,name,paperCount&limit=5`
+        );
+        const searchData = await searchRes.json();
+        const candidates = searchData.data || [];
+        if (candidates.length === 0) {
+          console.error(`❌ No author found for "${authorInput}". Try using their full name or S2 author ID from semanticscholar.org.`);
+          process.exit(1);
+        }
+        // Pick the one with the most papers (most likely the well-known researcher)
+        authorId = candidates.sort((a, b) => (b.paperCount || 0) - (a.paperCount || 0))[0].authorId;
+        const matched = candidates[0].name;
+        console.log(`👤 Resolved to author: "${matched}" (ID: ${authorId})`);
+      } catch (err) {
+        console.error("❌ Author search failed:", err.message);
+        process.exit(1);
+      }
+    }
+
+    // Step 2: fetch their papers, sorted by year desc, filter for arXiv papers
+    try {
+      const papersRes  = await fetchWithRetry(
+        `${API_BASE}/author/${authorId}/papers?fields=${FIELDS}&limit=50&sort=year:desc`
+      );
+      const papersData = await papersRes.json();
+      papers = papersData.data || [];
+      console.log(`📦 Received ${papers.length} papers by author`);
+    } catch (err) {
+      console.error("❌ Author papers fetch failed:", err.message);
+      process.exit(1);
+    }
   }
 
   // ── Filter ────────────────────────────────────────────────────
@@ -175,7 +251,6 @@ async function main() {
     .filter((p) => {
       if (!p.title || !p.externalIds?.ArXiv) return false;
       if ((p.citationCount || 0) < minCites) return false;
-      // Conference mode: must mention venue
       if (mode === "conference") {
         const venue = (p.venue || "").toUpperCase();
         if (!venue.includes(conference)) return false;
@@ -192,9 +267,11 @@ async function main() {
   console.log(`✅ ${filtered.length} papers pass filter`);
 
   if (filtered.length === 0) {
-    const tip = mode === "conference"
-      ? "Try lowering MIN_CITATIONS or check the conference name."
-      : "Try different keywords or check spelling.";
+    const tip =
+      mode === "conference" ? "Try lowering MIN_CITATIONS or check the conference name." :
+      mode === "topic"      ? "Try different keywords or check spelling." :
+      mode === "arxiv"      ? "Check that the arXiv ID is correct (e.g. 2106.09685)." :
+                              "This author may not have recent arXiv papers, or MIN_CITATIONS is too high.";
     console.log(`⚠️  No papers match criteria. ${tip}`);
     process.exit(0);
   }
@@ -305,7 +382,11 @@ async function main() {
     `| [${p.title.slice(0, 55)}…](${p.arxiv}) | ${p.domain} | ${p.citationCount} | ${p.hackabilityScore} |`
   ).join("\n");
 
-  const modeLabel = mode === "conference" ? `${conference} ${year}` : `topic "${topic}"`;
+  const modeLabel = 
+    mode === "conference" ? `${conference} ${year}` :
+    mode === "topic"      ? `topic "${topic}"` :
+    mode === "arxiv"      ? `arXiv:${arxivInput.replace(/.*abs\//, "").replace(/v\d+$/, "").trim()}` :
+                            `author "${authorInput}"`;
   const summary   = [
     `## 🤖 Paper Crawl Complete`,
     ``,

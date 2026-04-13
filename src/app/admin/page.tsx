@@ -23,6 +23,7 @@ import {
   Trophy,
   ListOrdered,
   PlayCircle,
+  Users,
 } from "lucide-react";
 import { cycles, getCyclePhase, cycleLabel } from "@/lib/data";
 import type { CyclePhase } from "@/lib/data";
@@ -580,7 +581,7 @@ const CONF_DESC: Record<Conf, string> = {
   NAACL:   "North American NLP",
 };
 
-type CrawlMode = "topic" | "conference";
+type CrawlMode = "topic" | "conference" | "arxiv" | "author";
 
 function TabCrawlPapers() {
   // Target cycle
@@ -593,6 +594,10 @@ function TabCrawlPapers() {
   const [minCites, setMinCites] = useState("30");
   // Topic mode params
   const [topic, setTopic]       = useState("");
+  // ArXiv mode params
+  const [arxivId, setArxivId]   = useState("");
+  // Author mode params
+  const [author, setAuthor]     = useState("");
   // Shared
   const [limit, setLimit]       = useState("15");
   const [error, setError]       = useState("");
@@ -607,8 +612,15 @@ function TabCrawlPapers() {
       }
       const m = parseInt(minCites, 10);
       if (isNaN(m) || m < 0) { setError("Min citations must be ≥ 0."); return false; }
-    } else {
+    } else if (mode === "topic") {
       if (!topic.trim()) { setError("Please enter a topic or keywords."); return false; }
+    } else if (mode === "arxiv") {
+      const cleaned = arxivId.replace(/.*abs\//, "").replace(/v\d+$/, "").trim();
+      if (!cleaned || !/^\d{4}\.\d{4,5}$/.test(cleaned)) {
+        setError("Enter a valid arXiv ID (e.g. 2106.09685) or full arXiv URL."); return false;
+      }
+    } else if (mode === "author") {
+      if (!author.trim()) { setError("Please enter an author name or Semantic Scholar author ID."); return false; }
     }
     const l = parseInt(limit, 10);
     if (isNaN(l) || l < 1 || l > 100) { setError("Limit must be 1–100."); return false; }
@@ -621,10 +633,14 @@ function TabCrawlPapers() {
     window.open(`https://github.com/${REPO}/actions/workflows/crawl-papers.yml`, "_blank", "noopener");
   }
 
+  const cleanArxivId = arxivId.replace(/.*abs\//, "").replace(/v\d+$/, "").trim();
+
   // Build the params summary shown to the user for the manual step
-  const paramSummary = mode === "conference"
-    ? `mode=conference, conference=${conf}, year=${year}, cycle_id=${targetCycleId || "(seeds)"}, limit=${limit}, min_citations=${minCites}`
-    : `mode=topic, topic="${topic}", cycle_id=${targetCycleId || "(seeds)"}, limit=${limit}`;
+  const paramSummary =
+    mode === "conference" ? `mode=conference, conference=${conf}, year=${year}, cycle_id=${targetCycleId || "(seeds)"}, limit=${limit}, min_citations=${minCites}` :
+    mode === "topic"      ? `mode=topic, topic="${topic}", cycle_id=${targetCycleId || "(seeds)"}, limit=${limit}` :
+    mode === "arxiv"      ? `mode=arxiv, arxiv_id=${cleanArxivId}, cycle_id=${targetCycleId || "(seeds)"}` :
+                            `mode=author, author="${author}", cycle_id=${targetCycleId || "(seeds)"}, limit=${limit}`;
 
   return (
     <div className="grid lg:grid-cols-5 gap-8">
@@ -695,7 +711,7 @@ function TabCrawlPapers() {
               m: "topic" as const,
               icon: <Search size={15} />,
               label: "Topic / Keyword",
-              desc: "Best when cycle is before the conference — search arXiv by topic",
+              desc: "Search arXiv by topic or keywords — best for recent preprints",
               color: "#42A5F5",
               bg: "rgba(66,165,245,0.08)",
               border: "rgba(66,165,245,0.3)",
@@ -704,10 +720,28 @@ function TabCrawlPapers() {
               m: "conference" as const,
               icon: <Database size={15} />,
               label: "Conference Venue",
-              desc: "Best after proceedings are published — filter by venue + year",
+              desc: "Filter by venue + year — best after proceedings are published",
               color: "#AB47BC",
               bg: "rgba(171,71,188,0.08)",
               border: "rgba(171,71,188,0.3)",
+            },
+            {
+              m: "arxiv" as const,
+              icon: <ExternalLink size={15} />,
+              label: "arXiv ID / URL",
+              desc: "Paste a specific arXiv ID or URL to add exactly one paper",
+              color: "#FF7043",
+              bg: "rgba(255,112,67,0.08)",
+              border: "rgba(255,112,67,0.3)",
+            },
+            {
+              m: "author" as const,
+              icon: <Users size={15} />,
+              label: "Author",
+              desc: "Fetch recent papers by a researcher (name or S2 author ID)",
+              color: "#4CAF50",
+              bg: "rgba(76,175,80,0.08)",
+              border: "rgba(76,175,80,0.3)",
             },
           ] as const).map(({ m, icon, label, desc, color, bg, border }) => (
             <button key={m} type="button" onClick={() => { setMode(m); setError(""); }}
@@ -740,6 +774,41 @@ function TabCrawlPapers() {
                   placeholder='e.g. "reasoning LLM 2025" or "vision language models efficient"'
                 />
                 <Field label="Max Papers" hint="1–100" value={limit} onChange={setLimit} type="text" required={false} placeholder="15" />
+              </>
+            ) : mode === "arxiv" ? (
+              <>
+                <Field
+                  label="arXiv ID or URL"
+                  hint='Paste a bare ID like "2106.09685" or the full URL https://arxiv.org/abs/2106.09685'
+                  value={arxivId}
+                  onChange={setArxivId}
+                  type="text"
+                  required={true}
+                  placeholder="e.g. 2106.09685"
+                />
+                <div className="rounded-xl p-3 text-xs flex items-start gap-2"
+                  style={{ background: "rgba(255,112,67,0.06)", border: "1px solid rgba(255,112,67,0.2)", color: "rgba(232,234,246,0.55)" }}>
+                  <Info size={12} className="shrink-0 mt-0.5" style={{ color: "#FF7043" }} />
+                  Fetches exactly one paper. No limit needed — ideal for adding a specific paper you found independently.
+                </div>
+              </>
+            ) : mode === "author" ? (
+              <>
+                <Field
+                  label="Author Name or S2 Author ID"
+                  hint='Full name (e.g. "Andrej Karpathy") or numeric Semantic Scholar author ID from their profile URL.'
+                  value={author}
+                  onChange={setAuthor}
+                  type="text"
+                  required={true}
+                  placeholder='e.g. "Ilya Sutskever" or "1741101"'
+                />
+                <Field label="Max Papers" hint="1–50 — sorted by most recent" value={limit} onChange={setLimit} type="text" required={false} placeholder="15" />
+                <div className="rounded-xl p-3 text-xs flex items-start gap-2"
+                  style={{ background: "rgba(76,175,80,0.06)", border: "1px solid rgba(76,175,80,0.2)", color: "rgba(232,234,246,0.55)" }}>
+                  <Info size={12} className="shrink-0 mt-0.5" style={{ color: "#4CAF50" }} />
+                  Only arXiv papers are added. The bot resolves the name to a Semantic Scholar profile and picks the most-cited match.
+                </div>
               </>
             ) : (
               <>

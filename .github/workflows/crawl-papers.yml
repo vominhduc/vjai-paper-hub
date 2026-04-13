@@ -4,25 +4,27 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: "Crawl mode: 'conference' (post-proceedings, by venue) or 'topic' (pre-conference, by keyword)"
+        description: "Crawl mode"
         required: true
         default: "topic"
         type: choice
         options:
           - topic
           - conference
+          - arxiv
+          - author
       cycle_id:
-        description: "Target cycle ID to attach suggestions to (e.g. 2026-jun). Leave blank to add to seeds.json."
+        description: "Target cycle ID (e.g. 2026-jun). Leave blank to add to seeds.json."
         required: false
         default: ""
         type: string
       topic:
-        description: "[topic mode] Keywords to search (e.g. 'reasoning LLM 2025', 'vision-language models')"
+        description: "[topic mode] Keywords to search (e.g. 'reasoning LLM 2025')"
         required: false
         default: ""
         type: string
       conference:
-        description: "[conference mode] Conference name (ICLR | NeurIPS | ICML | CVPR | EMNLP | ACL | ECCV | ICCV | NAACL)"
+        description: "[conference mode] Conference name"
         required: false
         default: "ICLR"
         type: choice
@@ -41,13 +43,23 @@ on:
         required: false
         default: "2025"
         type: string
+      arxiv_id:
+        description: "[arxiv mode] arXiv ID or URL (e.g. 2106.09685 or https://arxiv.org/abs/2106.09685)"
+        required: false
+        default: ""
+        type: string
+      author:
+        description: "[author mode] Researcher name (e.g. 'Andrej Karpathy') or Semantic Scholar author ID"
+        required: false
+        default: ""
+        type: string
       limit:
-        description: "Max number of papers to add (default 15)"
+        description: "Max number of papers to add (default 15, ignored in arxiv mode)"
         required: false
         default: "15"
         type: string
       min_citations:
-        description: "[conference mode] Minimum citation count (default 0 — topic mode ignores this)"
+        description: "[conference/author mode] Minimum citation count (default 0)"
         required: false
         default: "0"
         type: string
@@ -78,6 +90,8 @@ jobs:
           TOPIC:         ${{ github.event.inputs.topic }}
           CONFERENCE:    ${{ github.event.inputs.conference }}
           YEAR:          ${{ github.event.inputs.year }}
+          ARXIV_ID:      ${{ github.event.inputs.arxiv_id }}
+          AUTHOR:        ${{ github.event.inputs.author }}
           LIMIT:         ${{ github.event.inputs.limit }}
           MIN_CITATIONS: ${{ github.event.inputs.min_citations }}
         run: node scripts/crawl-papers.js
@@ -90,15 +104,13 @@ jobs:
           git diff --staged --quiet && echo "⚠️  No new papers to commit." || {
             MODE="${{ github.event.inputs.mode }}"
             CYCLE="${{ github.event.inputs.cycle_id }}"
-            TOPIC="${{ github.event.inputs.topic }}"
-            CONF="${{ github.event.inputs.conference }}"
-            YEAR="${{ github.event.inputs.year }}"
             COUNT="${{ steps.crawl.outputs.count }}"
-            if [ "$MODE" = "topic" ]; then
-              git commit -m "🤖 crawl [topic: ${TOPIC}] → ${CYCLE:-seeds} — ${COUNT} papers"
-            else
-              git commit -m "🤖 crawl [${CONF} ${YEAR}] → ${CYCLE:-seeds} — ${COUNT} papers"
-            fi
+            case "$MODE" in
+              topic)      git commit -m "🤖 crawl [topic: ${{ github.event.inputs.topic }}] → ${CYCLE:-seeds} — ${COUNT} papers" ;;
+              conference) git commit -m "🤖 crawl [${{ github.event.inputs.conference }} ${{ github.event.inputs.year }}] → ${CYCLE:-seeds} — ${COUNT} papers" ;;
+              arxiv)      git commit -m "🤖 crawl [arXiv: ${{ github.event.inputs.arxiv_id }}] → ${CYCLE:-seeds}" ;;
+              author)     git commit -m "🤖 crawl [author: ${{ github.event.inputs.author }}] → ${CYCLE:-seeds} — ${COUNT} papers" ;;
+            esac
             git push
           }
 
