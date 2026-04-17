@@ -23,6 +23,7 @@ export interface Nomination {
 }
 
 export interface Session {
+  location?: string;
   date: string;
   presenter: string;
   presenter_role: string;

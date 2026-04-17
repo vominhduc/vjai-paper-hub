@@ -9,6 +9,7 @@ import {
   ExternalLink,
   Users,
   Calendar,
+  MapPin,
   ChevronRight,
   Layers,
   BookOpenCheck,
@@ -325,6 +326,23 @@ function DeepDiveSpotlight({ cycle }: { cycle: Cycle }) {
                 <p className="text-sm font-semibold text-white">{cycle.session.date}</p>
               </div>
             </div>
+
+            {cycle.session.location && (
+              <div className="flex items-center gap-3">
+                <div
+                  className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                  style={{ background: "rgba(255,87,34,0.12)" }}
+                >
+                  <MapPin size={14} style={{ color: "#FF5722" }} />
+                </div>
+                <div>
+                  <p className="text-xs" style={{ color: "rgba(232,234,246,0.4)" }}>
+                    Location
+                  </p>
+                  <p className="text-sm font-semibold text-white">{cycle.session.location}</p>
+                </div>
+              </div>
+            )}
 
             <div className="flex items-center gap-3">
               <div

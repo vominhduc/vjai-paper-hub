@@ -112,6 +112,7 @@ function TabSetDates() {
   const [sessionDate, setSessionDate]           = useState("");
   const [presenter, setPresenter]               = useState("");
   const [presenterRole, setPresenterRole]       = useState("");
+  const [location, setLocation]                 = useState("");
   const [notes, setNotes]                       = useState("");
   const [error, setError]                       = useState("");
 
@@ -126,6 +127,7 @@ function TabSetDates() {
       setSessionDate(c.session_date ?? "");
       setPresenter(c.session.presenter ?? "");
       setPresenterRole(c.session.presenter_role ?? "");
+      setLocation(c.session.location ?? "");
       setNotes("");
     }
   }
@@ -151,6 +153,7 @@ function TabSetDates() {
       `### Deep Dive Session Date (YYYY-MM-DD)`, sessionDate, ``,
       `### Presenter (optional — leave blank to keep existing)`, presenter || "_No response_", ``,
       `### Presenter Role (optional)`, presenterRole || "_No response_", ``,
+      `### Location (optional)`, location || "_No response_", ``,
       `### Notes (optional)`, notes || "_No response_",
     ].join("\n");
     const params = new URLSearchParams({ template: "05-set-cycle-dates.yml", title, labels: "set-dates,admin", body });
@@ -226,6 +229,7 @@ function TabSetDates() {
               <p className="text-xs font-bold uppercase tracking-widest" style={{ color: "rgba(232,234,246,0.35)" }}>Presenter (optional)</p>
               <Field label="Presenter Name" hint="Leave blank to keep existing." value={presenter} onChange={setPresenter} type="text" required={false} placeholder="e.g. Duc Vo" />
               <Field label="Presenter Role" value={presenterRole} onChange={setPresenterRole} type="text" required={false} placeholder="e.g. ML Engineer · VJAI Core" />
+              <Field label="Location" hint="e.g. Google Meet, Zoom, HCMC Office" value={location} onChange={setLocation} type="text" required={false} placeholder="e.g. Google Meet" />
             </div>
 
             <div className="rounded-2xl p-6 flex flex-col gap-3" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>

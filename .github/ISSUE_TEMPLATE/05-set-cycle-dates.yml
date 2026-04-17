@@ -65,6 +65,15 @@ body:
     validations:
       required: false
 
+  - type: input
+    id: location
+    attributes:
+      label: "Location (optional)"
+      description: "Where the session will be held, e.g. Google Meet, Zoom, HCMC Office."
+      placeholder: "Google Meet"
+    validations:
+      required: false
+
   - type: textarea
     id: notes
     attributes:

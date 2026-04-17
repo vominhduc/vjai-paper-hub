@@ -23,6 +23,7 @@ async function main() {
   const sessionDate   = (fields["deep dive session date yyyymmdd"] || fields["deep dive session date"] || "").trim();
   const presenter     = (fields["presenter optional  leave blank to keep existing"] || fields["presenter"] || "").trim();
   const presenterRole = (fields["presenter role optional"] || fields["presenter role"] || "").trim();
+  const location      = (fields["location optional"] || fields["location"] || "").trim();
 
   if (!cycleId) {
     console.error("❌ Cycle ID is required.");
@@ -82,6 +83,7 @@ async function main() {
 
   if (presenter)     cycle.session.presenter      = presenter;
   if (presenterRole) cycle.session.presenter_role = presenterRole;
+  if (location)      cycle.session.location       = location;
 
   // Also update the session.date field (used for display)
   cycle.session.date = sessionDate;
@@ -95,6 +97,7 @@ async function main() {
   console.log(`   Deep Dive session   : ${old.session_date} → ${sessionDate}`);
   if (presenter)     console.log(`   Presenter           : ${cycle.session.presenter}`);
   if (presenterRole) console.log(`   Presenter role      : ${cycle.session.presenter_role}`);
+  if (location)      console.log(`   Location            : ${cycle.session.location}`);
 
   // Write summary for GitHub Actions step summary
   const summary = [
