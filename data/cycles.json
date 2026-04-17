@@ -103,28 +103,7 @@
     "nomination_end": "2026-05-21",
     "exploration_start": "2026-05-24",
     "session_date": "",
-    "nominations": [
-      {
-        "id": "p1",
-        "title": "Toolformer: Language Models That Can Use Tools",
-        "proposer": "Thanh Nguyen",
-        "arxiv": "https://arxiv.org/abs/2302.04761",
-        "tags": ["Agents", "LLM", "Tool Use"],
-        "is_selected": false,
-        "votes": 0,
-        "issue_number": 4
-      },
-      {
-        "id": "p2",
-        "title": "Voyager: An Open-Ended Embodied Agent with LLMs",
-        "proposer": "Bao Nguyen",
-        "arxiv": "https://arxiv.org/abs/2305.16291",
-        "tags": ["Agents", "LLM", "Embodied AI"],
-        "is_selected": false,
-        "votes": 0,
-        "issue_number": 5
-      }
-    ],
+    "nominations": [],
     "session": {
       "date": "",
       "location": "TBD",
