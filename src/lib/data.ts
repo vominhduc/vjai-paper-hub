@@ -32,8 +32,8 @@ export interface Session {
 
 export interface Cycle {
   id: string;
-  quarter: string;
-  cycle: number;
+  quarter?: string;
+  cycle?: number;
   month?: string;
   year?: number;
   theme: string;
