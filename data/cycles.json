@@ -41,17 +41,11 @@
       }
     ],
     "session": {
-      "date": "2026-03-15",
-      "location": "Google Meet",
-      "presenter": "Duc Vo",
-      "presenter_role": "ML Engineer · VJAI Core",
-      "agenda": [
-        "Why self-attention replaced RNNs — intuition and motivation",
-        "Multi-head attention and positional encoding deep-dive",
-        "Training the original Transformer from scratch (live coding)",
-        "Benchmarks: WMT En-De translation results walkthrough",
-        "Discussion: what would we change today?"
-      ]
+      "date": "",
+      "location": "",
+      "presenter": "",
+      "presenter_role": "",
+      "agenda": []
     }
   },
   {
@@ -93,17 +87,11 @@
       }
     ],
     "session": {
-      "date": "2026-04-12",
-      "location": "Google Meet",
-      "presenter": "Duc Vo",
-      "presenter_role": "ML Engineer · VJAI Core",
-      "agenda": [
-        "Paper motivation: why pure RL for LLM reasoning?",
-        "Methodology deep-dive: GRPO algorithm and reward shaping",
-        "Benchmark analysis: MATH-500, AIME, LiveCodeBench",
-        "Live demo: running DeepSeek-R1 locally with Ollama",
-        "Open Q&A and reproduction discussion"
-      ]
+      "date": "",
+      "location": "",
+      "presenter": "",
+      "presenter_role": "",
+      "agenda": []
     }
   },
   {
@@ -112,9 +100,9 @@
     "year": 2026,
     "theme": "Agents & Tool Use",
     "status": "active",
-    "nomination_end": "2026-04-29",
-    "exploration_start": "2026-04-30",
-    "session_date": "2026-05-17",
+    "nomination_end": "2026-05-13",
+    "exploration_start": "2026-05-24",
+    "session_date": "",
     "nominations": [
       {
         "id": "p1",
@@ -138,8 +126,9 @@
       }
     ],
     "session": {
-      "date": "2026-05-17",
-      "presenter": "TBA",
+      "date": "",
+      "location": "TBD",
+      "presenter": "TBD",
       "presenter_role": "",
       "agenda": []
     }
