@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 export default function Footer() {
   return (
     <footer
@@ -38,11 +40,11 @@ export default function Footer() {
               {[
                 { label: "Home", href: "/" },
                 { label: "Roadmap", href: "/roadmap" },
-                { label: "Papers Archive", href: "#papers" },
-                { label: "Join Session", href: "#schedule" },
+                { label: "Papers Archive", href: "/archive" },
+                { label: "Join Session", href: "/cycle" },
               ].map((l) => (
                 <li key={l.label}>
-                  <a
+                  <Link
                     href={l.href}
                     className="text-sm transition-colors duration-200"
                     style={{ color: "rgba(232,234,246,0.5)" }}
@@ -50,7 +52,7 @@ export default function Footer() {
                     onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(232,234,246,0.5)")}
                   >
                     {l.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -63,7 +65,7 @@ export default function Footer() {
             </h4>
             <ul className="flex flex-col gap-2">
               {[
-                { label: "GitHub", href: "https://github.com" },
+                { label: "GitHub", href: "https://github.com/vominhduc/vjai-paper-hub" },
                 { label: "Discord", href: "#" },
                 { label: "LinkedIn", href: "#" },
                 { label: "Nominate a Paper", href: "#" },

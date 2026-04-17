@@ -52,7 +52,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body: `## ✅ Session Archived!\n\n**${newest.title}**\n\n| Field | Value |\n|---|---|\n| Presenter | ${newest.presenter} |\n| Date | ${newest.date_read} |\n| Vibe Score | ${newest.vibeScore}% |\n| Status | ${newest.status} |\n| arXiv | [Link](${newest.resources.arxiv}) |\n\nThis paper is now live in the [Archive](https://vjai.github.io/paper-hub/archive). The cycle has been marked complete.`
+              body: `## ✅ Session Archived!\n\n**${newest.title}**\n\n| Field | Value |\n|---|---|\n| Presenter | ${newest.presenter} |\n| Date | ${newest.date_read} |\n| Vibe Score | ${newest.vibeScore}% |\n| Status | ${newest.status} |\n| arXiv | [Link](${newest.resources.arxiv}) |\n\nThis paper is now live in the [Archive](https://vominhduc.github.io/vjai-paper-hub/archive). The cycle has been marked complete.`
             });
 
             await github.rest.issues.update({
