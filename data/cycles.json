@@ -127,8 +127,8 @@
     "session_date": "",
     "nominations": [
       {
-        "id": "p1-arxiv-query-sea",
-        "title": "arXiv Query: search_query=&amp;id_list=2602.16813&amp;start=0&amp;max_results=1",
+        "id": "p1-flow-map-lm",
+        "title": "Flow Map Language Models: One-step Language Modeling via Continuous Denoising",
         "proposer": "Son",
         "arxiv": "https://arxiv.org/abs/2602.16813",
         "tags": [
