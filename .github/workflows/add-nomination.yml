@@ -7,7 +7,7 @@ on:
 
 jobs:
   add-nomination:
-    if: github.event.label.name == 'nominate'
+    if: github.event.label.name == 'nomination'
     runs-on: ubuntu-latest
     permissions:
       contents: write
