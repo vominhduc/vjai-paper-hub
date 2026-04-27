@@ -14,7 +14,11 @@
         "title": "Attention Is All You Need",
         "proposer": "Duc Vo",
         "arxiv": "https://arxiv.org/abs/1706.03762",
-        "tags": ["Transformers", "NLP", "Foundations"],
+        "tags": [
+          "Transformers",
+          "NLP",
+          "Foundations"
+        ],
         "is_selected": true,
         "votes": 22,
         "issue_number": 10
@@ -24,7 +28,11 @@
         "title": "BERT: Pre-training of Deep Bidirectional Transformers",
         "proposer": "Lan Nguyen",
         "arxiv": "https://arxiv.org/abs/1810.04805",
-        "tags": ["LLM", "Pretraining", "NLP"],
+        "tags": [
+          "LLM",
+          "Pretraining",
+          "NLP"
+        ],
         "is_selected": false,
         "votes": 14,
         "issue_number": 11
@@ -34,7 +42,11 @@
         "title": "GPT-3: Language Models are Few-Shot Learners",
         "proposer": "Minh Tran",
         "arxiv": "https://arxiv.org/abs/2005.14165",
-        "tags": ["LLM", "Few-Shot", "Scaling"],
+        "tags": [
+          "LLM",
+          "Few-Shot",
+          "Scaling"
+        ],
         "is_selected": false,
         "votes": 8,
         "issue_number": 12
@@ -63,7 +75,11 @@
         "title": "DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning",
         "proposer": "Duc Vo",
         "arxiv": "https://arxiv.org/abs/2501.12948",
-        "tags": ["LLM", "RL", "Reasoning"],
+        "tags": [
+          "LLM",
+          "RL",
+          "Reasoning"
+        ],
         "is_selected": true,
         "votes": 18
       },
@@ -72,7 +88,10 @@
         "title": "JEPA: A World Model for Self-Supervised Learning",
         "proposer": "Minh Tran",
         "arxiv": "https://arxiv.org/abs/2301.08243",
-        "tags": ["World Models", "Self-Supervised"],
+        "tags": [
+          "World Models",
+          "Self-Supervised"
+        ],
         "is_selected": false,
         "votes": 11
       },
@@ -81,7 +100,10 @@
         "title": "FlashAttention-3: Fast and Accurate Attention on H100 GPUs",
         "proposer": "Lan Nguyen",
         "arxiv": "https://arxiv.org/abs/2407.08608",
-        "tags": ["Systems", "Efficiency"],
+        "tags": [
+          "Systems",
+          "Efficiency"
+        ],
         "is_selected": false,
         "votes": 9
       }
@@ -103,7 +125,22 @@
     "nomination_end": "2026-05-21",
     "exploration_start": "2026-05-24",
     "session_date": "",
-    "nominations": [],
+    "nominations": [
+      {
+        "id": "p1-arxiv-query-sea",
+        "title": "arXiv Query: search_query=&amp;id_list=2602.16813&amp;start=0&amp;max_results=1",
+        "proposer": "Son",
+        "arxiv": "https://arxiv.org/abs/2602.16813",
+        "tags": [
+          "language models",
+          "diffusion",
+          "flow map"
+        ],
+        "is_selected": false,
+        "votes": 0,
+        "issue_number": 5
+      }
+    ],
     "session": {
       "date": "",
       "location": "TBD",
@@ -119,7 +156,12 @@
     "theme": "CVPR, ACL, ICML",
     "status": "planned",
     "nominations": [],
-    "session": { "date": "", "presenter": "", "presenter_role": "", "agenda": [] }
+    "session": {
+      "date": "",
+      "presenter": "",
+      "presenter_role": "",
+      "agenda": []
+    }
   },
   {
     "id": "2026-jul",
@@ -128,7 +170,12 @@
     "theme": "CVPR, ACL, ICML",
     "status": "planned",
     "nominations": [],
-    "session": { "date": "", "presenter": "", "presenter_role": "", "agenda": [] }
+    "session": {
+      "date": "",
+      "presenter": "",
+      "presenter_role": "",
+      "agenda": []
+    }
   },
   {
     "id": "2026-aug",
@@ -137,7 +184,12 @@
     "theme": "CVPR, ACL, ICML",
     "status": "planned",
     "nominations": [],
-    "session": { "date": "", "presenter": "", "presenter_role": "", "agenda": [] }
+    "session": {
+      "date": "",
+      "presenter": "",
+      "presenter_role": "",
+      "agenda": []
+    }
   },
   {
     "id": "2026-oct",
@@ -146,7 +198,12 @@
     "theme": "EMNLP, NeurIPS",
     "status": "planned",
     "nominations": [],
-    "session": { "date": "", "presenter": "", "presenter_role": "", "agenda": [] }
+    "session": {
+      "date": "",
+      "presenter": "",
+      "presenter_role": "",
+      "agenda": []
+    }
   },
   {
     "id": "2026-nov",
@@ -155,7 +212,12 @@
     "theme": "EMNLP, NeurIPS",
     "status": "planned",
     "nominations": [],
-    "session": { "date": "", "presenter": "", "presenter_role": "", "agenda": [] }
+    "session": {
+      "date": "",
+      "presenter": "",
+      "presenter_role": "",
+      "agenda": []
+    }
   },
   {
     "id": "2026-dec",
@@ -164,6 +226,11 @@
     "theme": "EMNLP, NeurIPS",
     "status": "planned",
     "nominations": [],
-    "session": { "date": "", "presenter": "", "presenter_role": "", "agenda": [] }
+    "session": {
+      "date": "",
+      "presenter": "",
+      "presenter_role": "",
+      "agenda": []
+    }
   }
 ]
