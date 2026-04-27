@@ -41,9 +41,15 @@ async function fetchArxivMeta(arxivUrlOrId) {
 
   // --- Parse fields from Atom XML (no external parser needed) ---
 
-  const getField = (tag) => {
+  // Extract the <entry> block — the feed itself has its own <title> (the query string)
+  // so we must scope all field lookups to the entry element.
+  const entryMatch = xml.match(/<entry>([\s\S]*?)<\/entry>/i);
+  if (!entryMatch) throw new Error(`No entry found in arXiv response for ID: ${id}`);
+  const entry = entryMatch[1];
+
+  const getField = (tag, src = entry) => {
     const re = new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`, "i");
-    const m = xml.match(re);
+    const m = src.match(re);
     return m ? m[1].replace(/<[^>]+>/g, "").trim().replace(/\s+/g, " ") : "";
   };
 
@@ -51,11 +57,11 @@ async function fetchArxivMeta(arxivUrlOrId) {
   const abstract = getField("summary");
 
   // Published date → year
-  const pubMatch = xml.match(/<published>(\d{4})/);
+  const pubMatch = entry.match(/<published>(\d{4})/);
   const year = pubMatch ? parseInt(pubMatch[1], 10) : new Date().getFullYear();
 
   // Authors (multiple <name> inside <author>)
-  const authorBlocks = [...xml.matchAll(/<author>[\s\S]*?<name>(.*?)<\/name>[\s\S]*?<\/author>/gi)];
+  const authorBlocks = [...entry.matchAll(/<author>[\s\S]*?<name>(.*?)<\/name>[\s\S]*?<\/author>/gi)];
   const authors = authorBlocks
     .map((m) => m[1].trim())
     .slice(0, 4) // cap at 4 to stay concise

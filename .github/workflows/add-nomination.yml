@@ -38,6 +38,7 @@ jobs:
           git config user.email "bot@vjai.dev"
           git add data/cycles.json
           git diff --staged --quiet || git commit -m "🗳️ nominate: add paper from issue #${{ github.event.issue.number }}"
+          git pull --rebase
           git push
 
       - name: React with ballot on issue
