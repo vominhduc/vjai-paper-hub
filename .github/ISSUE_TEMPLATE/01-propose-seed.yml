@@ -9,17 +9,28 @@ body:
     attributes:
       value: |
         ## Propose a Seed Paper
-        Fill in the arXiv URL — the bot will automatically fetch title, authors, abstract, and year.
+        Fill in the paper URL — the bot will automatically fetch title, authors, abstract, and year from arXiv.
         You only need to fill in the qualitative fields below.
 
+        > 💡 If linking to a blog post or project page, also fill in the **arXiv ID** field so metadata can be fetched automatically.
+
   - type: input
-    id: arxiv_url
+    id: paper_url
     attributes:
-      label: "arXiv URL"
-      description: "Full arXiv abstract URL, e.g. https://arxiv.org/abs/2501.12948"
-      placeholder: "https://arxiv.org/abs/..."
+      label: "Paper URL"
+      description: "Link to the paper — arXiv abstract, project page, blog post, or PDF. arXiv links are preferred for automatic metadata fetching."
+      placeholder: "https://arxiv.org/abs/... or any other link"
     validations:
       required: true
+
+  - type: input
+    id: arxiv_id
+    attributes:
+      label: "arXiv ID (if Paper URL is not an arXiv link)"
+      description: "Required when the Paper URL above is not an arXiv link. Leave blank if you already provided an arXiv URL."
+      placeholder: "e.g. 2501.12948"
+    validations:
+      required: false
 
   - type: dropdown
     id: domain

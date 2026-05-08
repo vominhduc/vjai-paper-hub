@@ -14,7 +14,7 @@ body:
         Each nominator gives a short presentation of their paper; afterwards, the community votes with 👍 reactions
         to select one paper for the full Deep Dive session.
 
-        > 💡 **Tip:** If you arrived here from the Seeds page, the Cycle ID and arXiv URL are already pre-filled for you.
+        > 💡 **Tip:** If you arrived here from the Seeds page, the Cycle ID and Paper URL are already pre-filled for you.
 
   - type: input
     id: nominator_name
@@ -35,13 +35,22 @@ body:
       required: true
 
   - type: input
-    id: arxiv_url
+    id: paper_url
     attributes:
-      label: "arXiv URL"
-      description: "Full arXiv abstract URL (pre-filled when nominating a Seed paper)"
-      placeholder: "https://arxiv.org/abs/..."
+      label: "Paper URL"
+      description: "Link to the paper — arXiv abstract, project page, blog post, or PDF. arXiv links are preferred for automatic metadata fetching."
+      placeholder: "https://arxiv.org/abs/... or any other link"
     validations:
       required: true
+
+  - type: input
+    id: arxiv_id
+    attributes:
+      label: "arXiv ID (if Paper URL is not an arXiv link)"
+      description: "Required when the Paper URL above is not an arXiv link. Leave blank if you already provided an arXiv URL."
+      placeholder: "e.g. 2501.12948"
+    validations:
+      required: false
 
   - type: input
     id: tags
