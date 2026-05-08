@@ -34,9 +34,27 @@ async function main() {
   ).trim();
   const proposer = nominatorName || issueAuthor;
 
-  const arxivUrl = fields["arxiv url"] || fields["arxiv"];
-  if (!arxivUrl?.includes("arxiv")) {
-    console.error("❌ No valid arXiv URL in issue body.");
+  // Accept either the new "paper url" field or the legacy "arxiv url" field
+  const paperUrl = fields["paper url"] || fields["arxiv url"] || fields["arxiv"] || "";
+  // Also accept an explicit arXiv ID field for non-arXiv links
+  const explicitArxivId = (fields["arxiv id if paper url is not an arxiv link"] || fields["arxiv id"] || "").trim();
+
+  // Resolve what to pass to fetchArxivMeta: prefer the explicit ID, then the URL
+  const arxivInput = explicitArxivId || paperUrl;
+  if (!arxivInput) {
+    console.error("❌ No Paper URL or arXiv ID found in issue body.");
+    process.exit(1);
+  }
+
+  // Quick check: if the URL doesn't look like arXiv AND no explicit arXiv ID was given,
+  // we won't be able to fetch metadata — fail early with a helpful message.
+  const looksLikeArxiv = arxivInput.toLowerCase().includes("arxiv") ||
+    /^\d{4}\.\d{4,5}(v\d+)?$/.test(arxivInput.trim());
+  if (!looksLikeArxiv) {
+    console.error(
+      `❌ Cannot fetch metadata: "${paperUrl}" is not an arXiv link.\n` +
+      `   Please also fill in the "arXiv ID" field (e.g. 2501.12948) when submitting a non-arXiv URL.`
+    );
     process.exit(1);
   }
 
@@ -47,8 +65,8 @@ async function main() {
   }
 
   // Fetch metadata
-  console.log(`🔍 Fetching arXiv metadata for: ${arxivUrl}`);
-  const meta = await fetchArxivMeta(arxivUrl);
+  console.log(`🔍 Fetching arXiv metadata for: ${arxivInput}`);
+  const meta = await fetchArxivMeta(arxivInput);
   console.log(`✅ Fetched: "${meta.title}"`);
 
   const cyclesPath = path.resolve(__dirname, "../data/cycles.json");

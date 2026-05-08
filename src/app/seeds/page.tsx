@@ -186,7 +186,7 @@ function SeedCard({ seed, cycleId }: { seed: SeedPaper; cycleId: string }) {
     `?labels=nomination&template=02-nominate-cycle.yml` +
     `&title=${encodeURIComponent(`Nominate: ${seed.title}`)}` +
     `&cycle_id=${encodeURIComponent(cycleId)}` +
-    (seed.arxiv ? `&arxiv_url=${encodeURIComponent(seed.arxiv)}` : "");
+    (seed.arxiv ? `&paper_url=${encodeURIComponent(seed.arxiv)}` : "");
 
   return (
     <div
