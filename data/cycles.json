@@ -139,6 +139,19 @@
         "is_selected": false,
         "votes": 0,
         "issue_number": 5
+      },
+      {
+        "id": "p2-vljepa-joint-em",
+        "title": "VL-JEPA: Joint Embedding Predictive Architecture for Vision-language",
+        "proposer": "Quan HoangDanh",
+        "arxiv": "https://arxiv.org/abs/2512.10942",
+        "tags": [
+          "Vision-language model",
+          "Joint Embedding Predictive Architecture"
+        ],
+        "is_selected": false,
+        "votes": 0,
+        "issue_number": 7
       }
     ],
     "session": {
