@@ -152,6 +152,19 @@
         "is_selected": false,
         "votes": 0,
         "issue_number": 7
+      },
+      {
+        "id": "p3-flow-where-you-",
+        "title": "Flow Where You Want",
+        "proposer": "Son",
+        "paper_url": "https://iclr-blogposts.github.io/2026/blog/2026/flow-where-you-want/",
+        "tags": [
+          "Latent Flow-Matching",
+          "Inference-time controls"
+        ],
+        "is_selected": false,
+        "votes": 0,
+        "issue_number": 10
       }
     ],
     "session": {
