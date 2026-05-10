@@ -15,6 +15,7 @@ body:
         to select one paper for the full Deep Dive session.
 
         > 💡 **Tip:** If you arrived here from the Seeds page, the Cycle ID and Paper URL are already pre-filled for you.
+        > For non-arXiv papers, make sure the issue title reads **"Nominate: Your Paper Title"** — that's how the title is recorded.
 
   - type: input
     id: nominator_name
@@ -42,15 +43,6 @@ body:
       placeholder: "https://arxiv.org/abs/... or any other link"
     validations:
       required: true
-
-  - type: input
-    id: arxiv_id
-    attributes:
-      label: "arXiv ID (if Paper URL is not an arXiv link)"
-      description: "Required when the Paper URL above is not an arXiv link. Leave blank if you already provided an arXiv URL."
-      placeholder: "e.g. 2501.12948"
-    validations:
-      required: false
 
   - type: input
     id: tags

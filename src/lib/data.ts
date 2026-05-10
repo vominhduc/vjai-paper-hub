@@ -15,7 +15,8 @@ export interface Nomination {
   id: string;
   title: string;
   proposer: string;
-  arxiv: string;
+  arxiv?: string;
+  paper_url?: string;
   tags: string[];
   is_selected: boolean;
   votes: number;

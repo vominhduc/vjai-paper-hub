@@ -220,8 +220,8 @@ export default function Home() {
                     ))}
                   </ul>
                   <div className="flex gap-3">
-                    {selected.arxiv && (
-                      <a href={selected.arxiv} target="_blank" rel="noopener noreferrer"
+                    {(selected.arxiv || selected.paper_url) && (
+                      <a href={selected.arxiv || selected.paper_url} target="_blank" rel="noopener noreferrer"
                         className="btn-orange flex-1 text-center text-white font-bold text-sm py-2.5 rounded-xl">
                         Read Paper
                       </a>

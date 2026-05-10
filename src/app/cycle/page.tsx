@@ -142,15 +142,15 @@ function NominationCard({
         </div>
       </div>
 
-      {nom.arxiv && (
+      {(nom.arxiv || nom.paper_url) && (
         <a
-          href={nom.arxiv}
+          href={nom.arxiv || nom.paper_url}
           target="_blank"
           rel="noopener noreferrer"
           className="text-xs font-semibold flex items-center gap-1"
           style={{ color: "#FF5722" }}
         >
-          <ExternalLink size={10} /> arXiv Paper
+          <ExternalLink size={10} /> {nom.arxiv ? "arXiv Paper" : "View Paper"}
         </a>
       )}
 
@@ -277,9 +277,9 @@ function DeepDiveSpotlight({ cycle }: { cycle: Cycle }) {
         </div>
 
         <div className="flex gap-3">
-          {selected?.arxiv && (
+          {(selected?.arxiv || selected?.paper_url) && (
             <a
-              href={selected.arxiv}
+              href={selected.arxiv || selected.paper_url}
               target="_blank"
               rel="noopener noreferrer"
               className="btn-orange flex-1 text-center text-white font-bold text-sm py-3 rounded-xl"
