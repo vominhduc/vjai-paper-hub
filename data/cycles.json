@@ -165,6 +165,22 @@
         "is_selected": false,
         "votes": 0,
         "issue_number": 10
+      },
+      {
+        "id": "p4-llms-get-lost-i",
+        "title": "LLMs Get Lost In Multi-Turn Conversation",
+        "proposer": "Mau Nguyen",
+        "paper_url": "https://openreview.net/pdf?id=VKGTGGcwl6",
+        "tags": [
+          "LLM",
+          "Reasoning",
+          "Multi-turn",
+          "Conversation",
+          "Hallucination"
+        ],
+        "is_selected": false,
+        "votes": 0,
+        "issue_number": 11
       }
     ],
     "session": {
