@@ -42,6 +42,7 @@ jobs:
             echo "committed=false" >> $GITHUB_OUTPUT
           else
             git commit -m "🗳️ sync: update vote counts [skip ci]"
+            git pull --rebase origin main
             git push
             echo "committed=true" >> $GITHUB_OUTPUT
           fi
