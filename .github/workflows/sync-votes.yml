@@ -1,10 +1,11 @@
 name: "🗳️ Sync Nomination Votes"
 
-# Runs every 6 hours and on manual dispatch
+# Runs once daily during the voting window (exploration_start + 3 days),
+# and on manual dispatch at any time.
 on:
   schedule:
-    - cron: "0 */6 * * *"   # every 6 hours
-  workflow_dispatch:         # manual trigger from GitHub UI
+    - cron: "0 9 * * *"   # once daily at 09:00 UTC
+  workflow_dispatch:        # manual trigger from GitHub UI
 
 jobs:
   sync-votes:

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // scripts/sync-votes.js
-// Triggered by: GitHub Actions on a schedule (every 6 hours) or manual dispatch
+// Triggered by: GitHub Actions once daily (09:00 UTC) or manual dispatch
 // Reads: All open issues labeled "nomination" via GitHub API
 // Writes: data/cycles.json  (updates vote counts from 👍 reactions, marks is_selected)
 //
