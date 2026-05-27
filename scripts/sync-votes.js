@@ -19,6 +19,25 @@ if (!REPO || !TOKEN) {
   process.exit(1);
 }
 
+/** Minimal date-only phase calculation mirroring src/lib/data.ts */
+function getCyclePhase(cycle) {
+  if (!cycle.nomination_end || !cycle.exploration_start) return "nominating";
+
+  const today    = new Date(); today.setHours(0,0,0,0);
+  const expStart = new Date(cycle.exploration_start); expStart.setHours(0,0,0,0);
+  const votingEnd = new Date(cycle.exploration_start); votingEnd.setHours(0,0,0,0);
+  votingEnd.setDate(votingEnd.getDate() + 3);
+
+  if (!cycle.session_date) {
+    return today >= expStart ? "voting" : "nominating";
+  }
+  const sessDate = new Date(cycle.session_date); sessDate.setHours(0,0,0,0);
+  if (today > sessDate)  return "archived";
+  if (today > votingEnd) return "deep-dive";
+  if (today >= expStart) return "voting";
+  return "nominating";
+}
+
 async function ghFetch(endpoint) {
   const res = await fetch(`https://api.github.com/repos/${REPO}${endpoint}`, {
     headers: {
@@ -35,10 +54,14 @@ async function main() {
   const cyclesPath = path.resolve(__dirname, "../data/cycles.json");
   const cycles = JSON.parse(fs.readFileSync(cyclesPath, "utf8"));
 
-  // Only process exploration-phase cycles
-  const activeCycles = cycles.filter((c) => c.status === "exploration");
+  // Only process active cycles that are in nominating or voting phase
+  const activeCycles = cycles.filter((c) => {
+    if (c.status !== "active") return false;
+    const phase = getCyclePhase(c);
+    return phase === "nominating" || phase === "voting";
+  });
   if (!activeCycles.length) {
-    console.log("ℹ️  No exploration-phase cycles found. Nothing to sync.");
+    console.log("ℹ️  No active nominating/voting cycles found. Nothing to sync.");
     return;
   }
 
@@ -73,9 +96,11 @@ async function main() {
       }
     }
 
-    // Re-select the nomination with the most votes (only if none is_selected yet)
+    // Auto-select the top paper only once voting phase has closed (deep-dive / archived)
+    // and nothing is selected yet
+    const phase = getCyclePhase(cycle);
     const hasSelected = cycle.nominations.some((n) => n.is_selected);
-    if (!hasSelected && cycle.nominations.length > 0) {
+    if (!hasSelected && cycle.nominations.length > 0 && phase !== "nominating" && phase !== "voting") {
       const best = [...cycle.nominations].sort((a, b) => b.votes - a.votes)[0];
       // Don't auto-select unless it has at least 3 votes (prevents 0-vote auto-selection)
       if (best.votes >= 3) {
