@@ -13,6 +13,7 @@ jobs:
     permissions:
       contents: write
       issues: read
+      actions: write
 
     steps:
       - name: Checkout
