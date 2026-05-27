@@ -156,7 +156,7 @@ function TabSetDates() {
       `### Location (optional)`, location || "_No response_", ``,
       `### Notes (optional)`, notes || "_No response_",
     ].join("\n");
-    const params = new URLSearchParams({ template: "05-set-cycle-dates.yml", title, labels: "set-dates,admin", body });
+    const params = new URLSearchParams({ title, labels: "set-dates,admin", body });
     window.open(`https://github.com/${REPO}/issues/new?${params}`, "_blank", "noopener");
   }
 
@@ -310,7 +310,7 @@ function TabManageCycles() {
       `### Notes (optional)`, notes || "_No response_",
     ].join("\n");
 
-    const params = new URLSearchParams({ template: "06-manage-cycle.yml", title, labels: "manage-cycle,admin", body });
+    const params = new URLSearchParams({ title, labels: "manage-cycle,admin", body });
     return `https://github.com/${REPO}/issues/new?${params}`;
   }
 
@@ -1020,7 +1020,7 @@ function TabOpenCycle() {
       `### Tentative Presenter (can be TBD)`, presenter || "_No response_", ``,
       `### Presenter Role`, presenterRole || "_No response_",
     ].join("\n");
-    const params = new URLSearchParams({ template: "04-new-cycle.yml", title, labels: "new-cycle,cycle", body });
+    const params = new URLSearchParams({ title, labels: "new-cycle,cycle", body });
     window.open(`https://github.com/${REPO}/issues/new?${params}`, "_blank", "noopener");
   }
 
