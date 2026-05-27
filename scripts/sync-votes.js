@@ -103,6 +103,8 @@ async function main() {
         console.log(`  ↑ #${issue.number} "${nom.title.slice(0, 50)}…" → ${nom.votes} → ${thumbsUp} votes`);
         nom.votes = thumbsUp;
         totalUpdated++;
+      } else {
+        console.log(`  ✓ #${issue.number} "${nom.title.slice(0, 40)}" — ${thumbsUp} votes (no change)`);
       }
     }
 
