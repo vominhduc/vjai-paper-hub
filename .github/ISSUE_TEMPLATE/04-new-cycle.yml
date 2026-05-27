@@ -1,5 +1,5 @@
 name: "📅 Open New Cycle"
-description: "Open a new nomination cycle for a quarter. Sets up the exploration phase."
+description: "Create a new cycle. Adds it to cycles.json as active with nomination phase open."
 title: "New Cycle: [CYCLE ID]"
 labels: ["new-cycle", "cycle"]
 assignees: []
@@ -9,31 +9,31 @@ body:
     attributes:
       value: |
         ## Open a New Nomination Cycle
-        This creates a new entry in `cycles.json` with `status: exploration`.
+        This creates a new entry in `cycles.json` with `status: active`.
         Share the issue link with the community to start collecting nominations.
 
   - type: input
     id: cycle_id
     attributes:
       label: "Cycle ID"
-      description: "Format: YYYY-Qn-Cn, e.g. 2026-q3-c1"
-      placeholder: "2026-q3-c1"
-    validations:
-      required: true
-
-  - type: dropdown
-    id: quarter
-    attributes:
-      label: "Quarter"
-      options: ["Q1", "Q2", "Q3", "Q4"]
+      description: "Format: YYYY-mmm, e.g. 2026-aug"
+      placeholder: "2026-aug"
     validations:
       required: true
 
   - type: input
-    id: cycle_number
+    id: month
     attributes:
-      label: "Cycle Number within Quarter"
-      placeholder: "1"
+      label: "Month"
+      placeholder: "August"
+    validations:
+      required: true
+
+  - type: input
+    id: year
+    attributes:
+      label: "Year"
+      placeholder: "2026"
     validations:
       required: true
 
@@ -47,12 +47,30 @@ body:
       required: true
 
   - type: input
+    id: nomination_end
+    attributes:
+      label: "Nomination End Date (YYYY-MM-DD)"
+      description: "Last day to submit nominations"
+      placeholder: "2026-08-10"
+    validations:
+      required: false
+
+  - type: input
+    id: exploration_start
+    attributes:
+      label: "Exploration Session Date (YYYY-MM-DD)"
+      description: "Date of the Exploration session (voting opens here)"
+      placeholder: "2026-08-14"
+    validations:
+      required: false
+
+  - type: input
     id: session_date
     attributes:
-      label: "Planned Session Date (YYYY-MM-DD)"
-      placeholder: "2026-07-12"
+      label: "Deep Dive Session Date (YYYY-MM-DD, optional)"
+      placeholder: "2026-08-28"
     validations:
-      required: true
+      required: false
 
   - type: input
     id: presenter
@@ -60,7 +78,7 @@ body:
       label: "Tentative Presenter (can be TBD)"
       placeholder: "TBD"
     validations:
-      required: true
+      required: false
 
   - type: input
     id: presenter_role
@@ -68,4 +86,4 @@ body:
       label: "Presenter Role"
       placeholder: "VJAI Community"
     validations:
-      required: true
+      required: false

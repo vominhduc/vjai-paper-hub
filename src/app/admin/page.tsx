@@ -985,6 +985,8 @@ function TabOpenCycle() {
   const [month, setMonth]             = useState("");
   const [year, setYear]               = useState(new Date().getFullYear().toString());
   const [theme, setTheme]             = useState("");
+  const [nominationEnd, setNominationEnd]       = useState("");
+  const [explorationStart, setExplorationStart] = useState("");
   const [sessionDate, setSessionDate] = useState("");
   const [presenter, setPresenter]     = useState("");
   const [presenterRole, setPresenterRole] = useState("");
@@ -1011,10 +1013,12 @@ function TabOpenCycle() {
       `### Cycle ID`, cycleId.trim(), ``,
       `### Month`, month || "_No response_", ``,
       `### Year`, year || "_No response_", ``,
-      `### Theme`, theme.trim(), ``,
-      `### Session Date (YYYY-MM-DD, optional)`, sessionDate || "_No response_", ``,
-      `### Presenter (optional)`, presenter || "_No response_", ``,
-      `### Presenter Role (optional)`, presenterRole || "_No response_",
+      `### Cycle Theme`, theme.trim(), ``,
+      `### Nomination End Date (YYYY-MM-DD)`, nominationEnd || "_No response_", ``,
+      `### Exploration Session Date (YYYY-MM-DD)`, explorationStart || "_No response_", ``,
+      `### Deep Dive Session Date (YYYY-MM-DD, optional)`, sessionDate || "_No response_", ``,
+      `### Tentative Presenter (can be TBD)`, presenter || "_No response_", ``,
+      `### Presenter Role`, presenterRole || "_No response_",
     ].join("\n");
     const params = new URLSearchParams({ template: "04-new-cycle.yml", title, labels: "new-cycle,cycle", body });
     window.open(`https://github.com/${REPO}/issues/new?${params}`, "_blank", "noopener");
@@ -1102,6 +1106,8 @@ function TabOpenCycle() {
           <p className="text-xs font-bold uppercase tracking-widest" style={{ color: "rgba(232,234,246,0.35)" }}>
             Dates & Presenter <span className="normal-case font-normal" style={{ color: "rgba(232,234,246,0.35)" }}>(optional — can be set later)</span>
           </p>
+          <Field label="Nomination End Date" hint="Last day to submit nominations." value={nominationEnd} onChange={setNominationEnd} required={false} />
+          <Field label="Exploration Session Date" hint="Date of the Exploration session — voting opens from here." value={explorationStart} onChange={setExplorationStart} required={false} />
           <Field label="Deep Dive Session Date" value={sessionDate} onChange={setSessionDate} required={false} />
           <Field label="Presenter Name" value={presenter} onChange={setPresenter} type="text" required={false} placeholder="e.g. Duc Vo" />
           <Field label="Presenter Role" value={presenterRole} onChange={setPresenterRole} type="text" required={false} placeholder="e.g. ML Engineer · VJAI Core" />

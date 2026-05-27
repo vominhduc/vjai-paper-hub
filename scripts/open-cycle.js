@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // scripts/open-cycle.js
 // Triggered by: GitHub Actions on issue labeled "new-cycle"
-// Writes: data/cycles.json (appends new exploration-phase cycle)
+// Writes: data/cycles.json (appends new active cycle)
 
 const fs = require("fs");
 const path = require("path");
@@ -17,16 +17,18 @@ async function main() {
   const fields = parseIssueBody(issueBody);
   console.log("📋 Parsed fields:", JSON.stringify(fields, null, 2));
 
-  const cycleId = fields["cycle id"];
-  const quarter = fields["quarter"];
-  const cycleNum = parseInt(fields["cycle number within quarter"] || fields["cycle number"] || "1", 10);
-  const theme = fields["cycle theme"] || "TBD";
-  const sessionDate = fields["planned session date yyyymmdd"] || fields["planned session date"] || "";
-  const presenter = fields["tentative presenter can be tbd"] || fields["presenter"] || "TBD";
-  const presenterRole = fields["presenter role"] || "VJAI Community";
+  const cycleId        = (fields["cycle id"] || "").trim();
+  const month          = (fields["month"] || "").trim();
+  const year           = parseInt(fields["year"] || new Date().getFullYear(), 10);
+  const theme          = (fields["cycle theme"] || "TBD").trim();
+  const nominationEnd  = (fields["nomination end date yyyymmdd"] || fields["nomination end date"] || "").trim();
+  const explorationStart = (fields["exploration session date yyyymmdd"] || fields["exploration session date"] || "").trim();
+  const sessionDate    = (fields["deep dive session date yyyymmdd optional"] || fields["deep dive session date"] || "").trim();
+  const presenter      = (fields["tentative presenter can be tbd"] || fields["presenter"] || "TBD").trim();
+  const presenterRole  = (fields["presenter role"] || "VJAI Community").trim();
 
-  if (!cycleId || !quarter) {
-    console.error("❌ Cycle ID and Quarter are required.");
+  if (!cycleId) {
+    console.error("❌ Cycle ID is required.");
     process.exit(1);
   }
 
@@ -40,13 +42,17 @@ async function main() {
 
   const newCycle = {
     id: cycleId,
-    quarter,
-    cycle: cycleNum,
-    status: "exploration",
+    month,
+    year,
     theme,
+    status: "active",
+    nomination_end: nominationEnd,
+    exploration_start: explorationStart,
+    session_date: sessionDate,
     nominations: [],
     session: {
       date: sessionDate,
+      location: "TBD",
       presenter,
       presenter_role: presenterRole,
       agenda: [],
@@ -57,7 +63,20 @@ async function main() {
   fs.writeFileSync(cyclesPath, JSON.stringify(cycles, null, 2) + "\n");
   console.log(`✅ Opened new cycle: "${cycleId}" — ${theme}`);
 
-  const summary = `### 📅 New Cycle Opened\n\n**${cycleId}**\n- Quarter: ${quarter}\n- Theme: ${theme}\n- Session Date: ${sessionDate || "TBD"}\n\nNominations are now open! Use the [Nominate template](../../issues/new?template=02-nominate-cycle.yml) to add papers.\n`;
+  const issueNumber = process.env.ISSUE_NUMBER || "?";
+  const repoUrl = `https://github.com/${process.env.GITHUB_REPOSITORY || "vominhduc/vjai-paper-hub"}`;
+  const summary = [
+    `### 📅 New Cycle Opened`,
+    ``,
+    `**${cycleId}** — ${theme}`,
+    `- Month: ${month} ${year}`,
+    `- Nomination End: ${nominationEnd || "TBD"}`,
+    `- Exploration: ${explorationStart || "TBD"}`,
+    `- Deep Dive: ${sessionDate || "TBD"}`,
+    ``,
+    `Nominations are now open! Use the [Nominate template](${repoUrl}/issues/new?template=02-nominate-cycle.yml) to add papers.`,
+  ].join("\n");
+
   if (process.env.GITHUB_STEP_SUMMARY) {
     fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, summary);
   }
