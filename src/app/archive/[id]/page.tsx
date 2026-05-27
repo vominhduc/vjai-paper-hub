@@ -17,8 +17,13 @@ import {
 import { archive } from "@/lib/data";
 
 /* ── Static params for export ─────────────────────────────── */
+export const dynamicParams = false;
+
 export function generateStaticParams() {
-  return archive.map((p) => ({ id: p.id }));
+  // With output:export, Next.js requires at least one param when archive is empty.
+  // Return a placeholder that will render notFound().
+  const items = archive.map((p) => ({ id: p.id }));
+  return items.length > 0 ? items : [{ id: "_placeholder" }];
 }
 
 /* ── Vibe score bar ───────────────────────────────────────── */
