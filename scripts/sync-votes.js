@@ -76,14 +76,24 @@ async function main() {
     page++;
   }
   console.log(`🔍 Found ${allIssues.length} open nomination issues.`);
+  if (allIssues.length > 0) {
+    console.log(`   Issue numbers: ${allIssues.map(i => `#${i.number}`).join(", ")}`);
+  }
 
   // For each nomination in each active cycle, try to match to an issue
   let totalUpdated = 0;
   for (const cycle of activeCycles) {
+    console.log(`\n📋 Cycle ${cycle.id} — ${cycle.nominations.length} nominations`);
     for (const nom of cycle.nominations) {
-      if (!nom.issue_number) continue;
+      if (!nom.issue_number) {
+        console.log(`   ⚠️  "${nom.title.slice(0, 40)}" — no issue_number, skipping`);
+        continue;
+      }
       const issue = allIssues.find((i) => i.number === nom.issue_number);
-      if (!issue) continue;
+      if (!issue) {
+        console.log(`   ❌ #${nom.issue_number} "${nom.title.slice(0, 40)}" — issue not found (closed or missing label?)`);
+        continue;
+      }
 
       // Count +1 reactions
       const reactions = await ghFetch(`/issues/${issue.number}/reactions`);
