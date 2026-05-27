@@ -150,7 +150,7 @@
           "Joint Embedding Predictive Architecture"
         ],
         "is_selected": false,
-        "votes": 0,
+        "votes": 1,
         "issue_number": 7
       },
       {
@@ -163,7 +163,7 @@
           "Inference-time controls"
         ],
         "is_selected": false,
-        "votes": 0,
+        "votes": 1,
         "issue_number": 10
       },
       {
