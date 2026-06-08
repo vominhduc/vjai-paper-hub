@@ -325,6 +325,8 @@ function TabManageCycles() {
       template: "06-manage-cycle.yml",
       title,
       cycle_id: selectedId,
+      action: actionLabel,
+      new_status: action === "status" ? newStatus : "no change",
       new_theme: action === "edit" && newTheme ? newTheme : "",
       new_month: action === "edit" && newMonth ? newMonth : "",
       new_year:  action === "edit" && newYear  ? newYear  : "",

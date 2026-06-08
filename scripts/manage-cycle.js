@@ -21,14 +21,18 @@ async function main() {
   console.log("📋 Parsed fields:", JSON.stringify(fields, null, 2));
 
   const cycleId   = (fields["cycle id"] || "").trim();
-  const action    = (fields["action"] || "").toLowerCase().trim();
-  const newStatus = (fields["new status (for status action)"] || fields["new status"] || "").toLowerCase().trim();
-  const newTheme  = (fields["new theme (for edit action)"] || fields["new theme"] || "").trim();
-  const newMonth  = (fields["new month (for edit action)"] || fields["new month"] || "").trim();
-  const newYear   = (fields["new year (for edit action)"] || fields["new year"] || "").trim();
-  const selectId  = (fields["nomination id (for select action)"] || fields["nomination id"] || "").trim();
-  const agendaRaw = (fields["agenda items (for agenda action, one per line)"] || fields["agenda items"] || "").trim();
-  const notes     = (fields["notes (optional)"] || fields["notes"] || "").trim();
+  // Dropdown values include a description suffix (e.g. "status — change the cycle status");
+  // extract just the keyword before the em-dash separator.
+  const action    = (fields["action"] || "").replace(/\s*[—–].+$/, "").toLowerCase().trim();
+  // parseIssueBody strips non-alphanumeric chars (including parens) from heading keys,
+  // so "New Status (for status action)" becomes "new status for status action".
+  const newStatus = (fields["new status for status action"] || fields["new status"] || "").toLowerCase().trim();
+  const newTheme  = (fields["new theme for edit action"] || fields["new theme"] || "").trim();
+  const newMonth  = (fields["new month for edit action"] || fields["new month"] || "").trim();
+  const newYear   = (fields["new year for edit action"] || fields["new year"] || "").trim();
+  const selectId  = (fields["nomination id for select action"] || fields["nomination id"] || "").trim();
+  const agendaRaw = (fields["agenda items for agenda action one per line"] || fields["agenda items"] || "").trim();
+  const notes     = (fields["notes optional"] || fields["notes"] || "").trim();
 
   if (!cycleId) { console.error("❌ Cycle ID is required."); process.exit(1); }
   if (!VALID_ACTIONS.includes(action)) {
