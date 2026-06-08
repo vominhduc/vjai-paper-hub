@@ -36,14 +36,17 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 /* ─── Page ────────────────────────────────────────────────── */
 export default function Home() {
   const deepDiveCycle = cycles.find((c) => getCyclePhase(c) === "deep-dive");
-  const activeCycle =
-    deepDiveCycle ??
-    cycles.find((c) => getCyclePhase(c) === "voting") ??
-    cycles.find((c) => getCyclePhase(c) === "nominating") ??
-    cycles[0];
+  // A second concurrent cycle (nominating/voting) can exist alongside a deep-dive
+  const nextActiveCycle =
+    cycles.find((c) => c !== deepDiveCycle && getCyclePhase(c) === "voting") ??
+    cycles.find((c) => c !== deepDiveCycle && getCyclePhase(c) === "nominating");
+  const activeCycle = deepDiveCycle ?? nextActiveCycle ?? cycles[0];
   const phase = activeCycle ? getCyclePhase(activeCycle) : "nominating";
   const selected = deepDiveCycle?.nominations.find((n) => n.is_selected);
   const recentPapers = archive.slice(0, 3);
+  // Cycle to show in the nominations card — prefer the new cycle when deep-dive is also active
+  const nomCycle = nextActiveCycle ?? (phase !== "deep-dive" ? activeCycle : null);
+  const nomPhase = nomCycle ? getCyclePhase(nomCycle) : null;
 
   return (
     <div
@@ -234,8 +237,8 @@ export default function Home() {
                 </div>
               )}
 
-              {/* Nominating / Voting: show current nominations */}
-              {(phase === "nominating" || phase === "voting") && activeCycle && (
+              {/* Nominating / Voting: show current nominations (also renders alongside deep-dive) */}
+              {nomCycle && nomPhase && (nomPhase === "nominating" || nomPhase === "voting") && (
                 <div
                   className="glass-card rounded-2xl p-7 relative overflow-hidden"
                   style={{ border: "1px solid rgba(66,165,245,0.2)" }}
@@ -243,27 +246,27 @@ export default function Home() {
                   <div className="flex items-start justify-between mb-4">
                     <div>
                       <p className="text-xs mb-1" style={{ color: "rgba(232,234,246,0.4)" }}>
-                        {cycleLabel(activeCycle)}
+                        {cycleLabel(nomCycle)}
                       </p>
                     </div>
 
                     <span
                       className="text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shrink-0"
                       style={{
-                        background: phase === "voting" ? "rgba(255,152,0,0.12)" : "rgba(66,165,245,0.1)",
-                        color: phase === "voting" ? "#FF9800" : "#42A5F5",
-                        border: `1px solid ${phase === "voting" ? "rgba(255,152,0,0.3)" : "rgba(66,165,245,0.25)"}`,
+                        background: nomPhase === "voting" ? "rgba(255,152,0,0.12)" : "rgba(66,165,245,0.1)",
+                        color: nomPhase === "voting" ? "#FF9800" : "#42A5F5",
+                        border: `1px solid ${nomPhase === "voting" ? "rgba(255,152,0,0.3)" : "rgba(66,165,245,0.25)"}`,
                       }}
                     >
                       <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
-                      {phase === "voting" ? "Voting Open" : "Nominations Open"}
+                      {nomPhase === "voting" ? "Voting Open" : "Nominations Open"}
                     </span>
                   </div>
 
                   <div className="glow-line mb-4" />
 
                   <div className="flex flex-col gap-3 mb-5">
-                    {[...activeCycle.nominations]
+                    {[...nomCycle.nominations]
                       .sort((a, b) => b.votes - a.votes)
                       .slice(0, 3)
                       .map((nom, i) => (
@@ -283,7 +286,7 @@ export default function Home() {
 
                   <Link href="/cycle"
                     className="btn-ghost w-full text-center text-white font-semibold text-sm py-2.5 rounded-xl block">
-                    {phase === "voting" ? "Vote Now →" : "View & Nominate →"}
+                    {nomPhase === "voting" ? "Vote Now →" : "View & Nominate →"}
                   </Link>
                 </div>
               )}
