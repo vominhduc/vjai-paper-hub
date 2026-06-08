@@ -45,7 +45,7 @@
           "Latent Flow-Matching",
           "Inference-time controls"
         ],
-        "is_selected": false,
+        "is_selected": true,
         "votes": 1,
         "issue_number": 10
       },
