@@ -36,10 +36,11 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 /* ─── Page ────────────────────────────────────────────────── */
 export default function Home() {
   const deepDiveCycle = cycles.find((c) => getCyclePhase(c) === "deep-dive");
-  // A second concurrent cycle (nominating/voting) can exist alongside a deep-dive
+  // A second concurrent cycle (nominating/voting) can exist alongside a deep-dive.
+  // Must filter to status === "active" — planned cycles with no dates also return "nominating".
   const nextActiveCycle =
-    cycles.find((c) => c !== deepDiveCycle && getCyclePhase(c) === "voting") ??
-    cycles.find((c) => c !== deepDiveCycle && getCyclePhase(c) === "nominating");
+    cycles.find((c) => c !== deepDiveCycle && c.status === "active" && getCyclePhase(c) === "voting") ??
+    cycles.find((c) => c !== deepDiveCycle && c.status === "active" && getCyclePhase(c) === "nominating");
   const activeCycle = deepDiveCycle ?? nextActiveCycle ?? cycles[0];
   const phase = activeCycle ? getCyclePhase(activeCycle) : "nominating";
   const selected = deepDiveCycle?.nominations.find((n) => n.is_selected);
@@ -243,11 +244,12 @@ export default function Home() {
                   className="glass-card rounded-2xl p-7 relative overflow-hidden"
                   style={{ border: "1px solid rgba(66,165,245,0.2)" }}
                 >
-                  <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-start justify-between mb-3">
                     <div>
-                      <p className="text-xs mb-1" style={{ color: "rgba(232,234,246,0.4)" }}>
+                      <p className="text-xs mb-0.5" style={{ color: "rgba(232,234,246,0.4)" }}>
                         {cycleLabel(nomCycle)}
                       </p>
+                      <p className="text-sm font-bold text-white">{nomCycle.theme}</p>
                     </div>
 
                     <span
@@ -263,28 +265,56 @@ export default function Home() {
                     </span>
                   </div>
 
+                  {(nomCycle.nomination_end || nomCycle.exploration_start) && (
+                    <div className="flex gap-4 mb-3 text-xs" style={{ color: "rgba(232,234,246,0.4)" }}>
+                      {nomCycle.nomination_end && (
+                        <span>
+                          <Calendar size={10} className="inline mr-1" />
+                          Closes{" "}
+                          <strong className="text-white">
+                            {new Date(nomCycle.nomination_end).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                          </strong>
+                        </span>
+                      )}
+                      {nomCycle.exploration_start && (
+                        <span>
+                          Exploration{" "}
+                          <strong className="text-white">
+                            {new Date(nomCycle.exploration_start).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                          </strong>
+                        </span>
+                      )}
+                    </div>
+                  )}
+
                   <div className="glow-line mb-4" />
 
                   <div className="flex flex-col gap-3 mb-5">
-                    {[...nomCycle.nominations]
-                      .sort((a, b) => b.votes - a.votes)
-                      .slice(0, 3)
-                      .map((nom, i) => (
-                        <div key={nom.id} className="flex items-start gap-3">
-                          <span
-                            className="text-xs font-black w-5 shrink-0 mt-0.5"
-                            style={{ color: i === 0 ? "#FF5722" : "rgba(232,234,246,0.3)" }}
-                          >
-                            #{i + 1}
-                          </span>
-                          <p className="text-xs text-white leading-snug flex-1 line-clamp-2">
-                            {nom.title}
-                          </p>
-                        </div>
-                      ))}
+                    {nomCycle.nominations.length === 0 ? (
+                      <p className="text-xs" style={{ color: "rgba(232,234,246,0.35)" }}>
+                        No nominations yet — be the first to nominate a paper!
+                      </p>
+                    ) : (
+                      [...nomCycle.nominations]
+                        .sort((a, b) => b.votes - a.votes)
+                        .slice(0, 3)
+                        .map((nom, i) => (
+                          <div key={nom.id} className="flex items-start gap-3">
+                            <span
+                              className="text-xs font-black w-5 shrink-0 mt-0.5"
+                              style={{ color: i === 0 ? "#FF5722" : "rgba(232,234,246,0.3)" }}
+                            >
+                              #{i + 1}
+                            </span>
+                            <p className="text-xs text-white leading-snug flex-1 line-clamp-2">
+                              {nom.title}
+                            </p>
+                          </div>
+                        ))
+                    )}
                   </div>
 
-                  <Link href="/cycle"
+                  <Link href={`/cycle?cycle=${nomCycle.id}`}
                     className="btn-ghost w-full text-center text-white font-semibold text-sm py-2.5 rounded-xl block">
                     {nomPhase === "voting" ? "Vote Now →" : "View & Nominate →"}
                   </Link>
