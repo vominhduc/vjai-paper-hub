@@ -39,7 +39,8 @@ jobs:
           git config user.email "bot@vjai.dev"
           git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}
           git add data/cycles.json
-          git diff --staged --quiet || (git pull --rebase origin main && git commit -m "⚙️ cycle: manage cycle from issue #${{ github.event.issue.number }}")
+          git diff --staged --quiet || git commit -m "⚙️ cycle: manage cycle from issue #${{ github.event.issue.number }}"
+          git pull --rebase origin main
           git push
 
       - name: Comment and close issue
