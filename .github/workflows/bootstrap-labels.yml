@@ -14,9 +14,16 @@ jobs:
         with:
           script: |
             const labels = [
-              { name: "nomination", color: "0075ca", description: "Paper nominated for a cycle" },
-              { name: "cycle",      color: "e4e669", description: "Related to a reading cycle" },
-              { name: "seed",       color: "d93f0b", description: "Seed paper suggested by organizers" },
+              { name: "nomination",   color: "0075ca", description: "Paper nominated for a cycle" },
+              { name: "cycle",        color: "e4e669", description: "Related to a reading cycle" },
+              { name: "seed",         color: "d93f0b", description: "Seed paper suggested by organizers" },
+              { name: "new-cycle",    color: "1d76db", description: "Opens a new nomination cycle" },
+              { name: "set-dates",    color: "0e8a16", description: "Sets or updates cycle dates" },
+              { name: "manage-cycle", color: "5319e7", description: "Admin: manage cycle status/details" },
+              { name: "admin",        color: "b60205", description: "Admin action" },
+              { name: "archive",      color: "006b75", description: "Archives a completed session" },
+              { name: "completed",    color: "0075ca", description: "Session has been completed" },
+              { name: "proposal",     color: "e4e669", description: "Seed paper proposal" },
             ];
 
             for (const label of labels) {
