@@ -73,5 +73,23 @@
       "presenter_role": "",
       "agenda": []
     }
+  },
+  {
+    "id": "2026-jun",
+    "month": "June",
+    "year": 2026,
+    "theme": "CVPR",
+    "status": "active",
+    "nomination_end": "2026-06-25",
+    "exploration_start": "2026-06-28",
+    "session_date": "",
+    "nominations": [],
+    "session": {
+      "date": "",
+      "location": "TBD",
+      "presenter": "TBD",
+      "presenter_role": "VJAI Community",
+      "agenda": []
+    }
   }
 ]
