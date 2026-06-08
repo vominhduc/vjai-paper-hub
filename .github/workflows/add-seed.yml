@@ -13,6 +13,7 @@ jobs:
     permissions:
       contents: write       # push data/seeds.json
       issues: write         # post comment back to issue
+      actions: write        # trigger deploy.yml via workflow_dispatch
 
     steps:
       - name: Checkout
@@ -33,11 +34,15 @@ jobs:
         run: node scripts/add-seed.js
 
       - name: Commit updated seeds.json
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config user.name "vjai-bot"
           git config user.email "bot@vjai.dev"
+          git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}
           git add data/seeds.json
           git diff --staged --quiet || git commit -m "🌱 seed: add paper from issue #${{ github.event.issue.number }}"
+          git pull --rebase origin main
           git push
 
       - name: Comment on Issue

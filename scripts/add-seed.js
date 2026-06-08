@@ -58,7 +58,7 @@ async function main() {
     100,
     Math.max(0, parseInt(fields["hackability score 0100"] || fields["hackability score"] || "70", 10))
   );
-  const description = fields["onelined description"] || fields["description"] || meta.abstract.slice(0, 120) + "…";
+  const description = fields["oneline description"] || fields["description"] || meta.abstract.slice(0, 120) + "…";
   const conference = fields["conference  venue"] || fields["conference"] || "Preprint";
   const proposedBy = process.env.ISSUE_AUTHOR || fields["proposed by"] || "VJAI Community";
 
