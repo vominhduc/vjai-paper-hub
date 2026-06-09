@@ -83,7 +83,21 @@
     "nomination_end": "2026-06-25",
     "exploration_start": "2026-06-28",
     "session_date": "",
-    "nominations": [],
+    "nominations": [
+      {
+        "id": "p1-insid3-training",
+        "title": "INSID3: Training-Free In-Context Segmentation with DINOv3",
+        "proposer": "Duc Vo",
+        "arxiv": "https://arxiv.org/abs/2603.28480",
+        "tags": [
+          "training-free",
+          "in-context segmentation"
+        ],
+        "is_selected": false,
+        "votes": 0,
+        "issue_number": 25
+      }
+    ],
     "session": {
       "date": "",
       "location": "TBD",
