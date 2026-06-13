@@ -96,6 +96,20 @@
         "is_selected": false,
         "votes": 0,
         "issue_number": 25
+      },
+      {
+        "id": "p2-grounded-3dawar",
+        "title": "Grounded 3D-Aware Spatial Vision-Language Modeling",
+        "proposer": "Mau Nguyen",
+        "arxiv": "https://arxiv.org/abs/2605.30307",
+        "tags": [
+          "VLM",
+          "3D",
+          "Spatial"
+        ],
+        "is_selected": false,
+        "votes": 0,
+        "issue_number": 26
       }
     ],
     "session": {
