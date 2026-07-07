@@ -7,7 +7,7 @@
     "status": "active",
     "nomination_end": "2026-05-21",
     "exploration_start": "2026-05-24",
-    "session_date": "2026-06-28",
+    "session_date": "2026-07-26",
     "nominations": [
       {
         "id": "p1-flow-map-lm",
@@ -67,7 +67,7 @@
       }
     ],
     "session": {
-      "date": "2026-06-28",
+      "date": "2026-07-26",
       "location": "Tokyo Science (Tokodai)",
       "presenter": "Son",
       "presenter_role": "",
