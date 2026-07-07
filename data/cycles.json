@@ -80,9 +80,9 @@
     "year": 2026,
     "theme": "CVPR",
     "status": "active",
-    "nomination_end": "2026-06-25",
-    "exploration_start": "2026-06-28",
-    "session_date": "",
+    "nomination_end": "2026-07-23",
+    "exploration_start": "2026-07-26",
+    "session_date": "2026-08-16",
     "nominations": [
       {
         "id": "p1-insid3-training",
@@ -113,7 +113,7 @@
       }
     ],
     "session": {
-      "date": "",
+      "date": "2026-08-16",
       "location": "TBD",
       "presenter": "TBD",
       "presenter_role": "VJAI Community",
