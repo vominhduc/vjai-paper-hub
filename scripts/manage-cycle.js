@@ -26,7 +26,8 @@ async function main() {
   const action    = (fields["action"] || "").replace(/\s*[—–].+$/, "").toLowerCase().trim();
   // parseIssueBody strips non-alphanumeric chars (including parens) from heading keys,
   // so "New Status (for status action)" becomes "new status for status action".
-  const newStatus = (fields["new status for status action"] || fields["new status"] || "").toLowerCase().trim();
+  const newStatusRaw = (fields["new status for status action"] || fields["new status"] || "").toLowerCase().trim();
+  const newStatus = newStatusRaw === "no change" ? "" : newStatusRaw;
   const newTheme  = (fields["new theme for edit action"] || fields["new theme"] || "").trim();
   const newMonth  = (fields["new month for edit action"] || fields["new month"] || "").trim();
   const newYear   = (fields["new year for edit action"] || fields["new year"] || "").trim();
