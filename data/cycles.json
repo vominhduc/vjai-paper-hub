@@ -119,5 +119,23 @@
       "presenter_role": "VJAI Community",
       "agenda": []
     }
+  },
+  {
+    "id": "2026-aug",
+    "month": "August",
+    "year": 2026,
+    "theme": "CVPR, ICML, ACL, ECCV",
+    "status": "active",
+    "nomination_end": "2026-08-25",
+    "exploration_start": "2026-08-30",
+    "session_date": "",
+    "nominations": [],
+    "session": {
+      "date": "",
+      "location": "TBD",
+      "presenter": "TBD",
+      "presenter_role": "VJAI Community",
+      "agenda": []
+    }
   }
 ]
