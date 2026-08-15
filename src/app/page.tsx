@@ -316,10 +316,17 @@ export default function Home() {
                     )}
                   </div>
 
-                  <Link href={`/cycle?cycle=${nomCycle.id}`}
-                    className="btn-ghost w-full text-center text-white font-semibold text-sm py-2.5 rounded-xl block">
-                    {nomPhase === "voting" ? "Vote Now →" : "View & Nominate →"}
-                  </Link>
+                  <div className="flex gap-2">
+                    <Link href={`/cycle?cycle=${nomCycle.id}`}
+                      className="btn-ghost flex-1 text-center text-white font-semibold text-sm py-2.5 rounded-xl block">
+                      {nomPhase === "voting" ? "Vote Now →" : "View & Nominate →"}
+                    </Link>
+                    <Link href={`/join?cycle=${nomCycle.id}`}
+                      className="text-center font-semibold text-sm py-2.5 px-4 rounded-xl block"
+                      style={{ background: "rgba(251,146,60,0.15)", color: "#fb923c", border: "1px solid rgba(251,146,60,0.3)" }}>
+                      Register →
+                    </Link>
+                  </div>
                 </div>
               )}
             </div>
