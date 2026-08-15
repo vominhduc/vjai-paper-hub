@@ -9,8 +9,9 @@ import {
   Calendar,
   ChevronRight,
   Star,
+  Trophy,
 } from "lucide-react";
-import { cycles, archive, getCyclePhase, siteStats, cycleLabel } from "@/lib/data";
+import { cycles, archive, getCyclePhase, siteStats, cycleLabel, getLeaderboard } from "@/lib/data";
 import Countdown from "@/components/Countdown";
 
 
@@ -43,11 +44,12 @@ export default function Home() {
     cycles.find((c) => c !== deepDiveCycle && c.status === "active" && getCyclePhase(c) === "nominating");
   const activeCycle = deepDiveCycle ?? nextActiveCycle ?? cycles[0];
   const phase = activeCycle ? getCyclePhase(activeCycle) : "nominating";
-  const selected = deepDiveCycle?.nominations.find((n) => n.is_selected);
+  const selected = deepDiveCycle?.nominations.find((n) => n.is_selected && n.votes === Math.max(...(deepDiveCycle?.nominations.filter(n2 => n2.is_selected).map(n2 => n2.votes) ?? [0])));
   const recentPapers = archive.slice(0, 3);
   // Cycle to show in the nominations card — prefer the new cycle when deep-dive is also active
   const nomCycle = nextActiveCycle ?? (phase !== "deep-dive" ? activeCycle : null);
   const nomPhase = nomCycle ? getCyclePhase(nomCycle) : null;
+  const leaderboard = getLeaderboard().slice(0, 5);
 
   return (
     <div
@@ -508,6 +510,70 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ══ LEADERBOARD ══════════════════════════════════════ */}
+      {leaderboard.length > 0 && (
+        <section className="py-20">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="flex items-end justify-between mb-10">
+              <div>
+                <SectionLabel>Community</SectionLabel>
+                <h2 className="text-3xl font-black text-white">Top Contributors</h2>
+              </div>
+              <Link href="/leaderboard" className="text-sm font-semibold flex items-center gap-1.5" style={{ color: "#FF5722" }}>
+                Full leaderboard <ArrowRight size={13} />
+              </Link>
+            </div>
+
+            <div className="grid md:grid-cols-5 gap-4">
+              {leaderboard.map((entry, idx) => {
+                const rank = idx + 1;
+                const rankColor =
+                  rank === 1 ? "#FFD700" : rank === 2 ? "#C0C0C0" : rank === 3 ? "#CD7F32" : "rgba(232,234,246,0.3)";
+                const rankBg =
+                  rank === 1 ? "rgba(255,215,0,0.12)" : rank === 2 ? "rgba(192,192,192,0.10)" : rank === 3 ? "rgba(205,127,50,0.10)" : "rgba(255,255,255,0.05)";
+                return (
+                  <div
+                    key={entry.name}
+                    className="glass-card glow-border-hover rounded-2xl p-5 flex flex-col items-center text-center gap-3"
+                    style={{
+                      border: `1px solid ${rank <= 3 ? rankColor + "55" : "rgba(255,255,255,0.07)"}`,
+                      background: rank <= 3 ? rankBg : "rgba(255,255,255,0.02)",
+                    }}
+                  >
+                    {/* Rank */}
+                    <div
+                      className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-black"
+                      style={{ background: rank <= 3 ? rankColor : "rgba(255,255,255,0.08)", color: rank <= 3 ? "#000" : "rgba(232,234,246,0.5)" }}
+                    >
+                      {rank === 1 ? <Trophy size={13} /> : rank}
+                    </div>
+
+                    {/* Avatar */}
+                    <div
+                      className="w-12 h-12 rounded-full flex items-center justify-center text-base font-bold"
+                      style={{ background: "rgba(255,87,34,0.12)", color: "#FF8A65", border: "1px solid rgba(255,87,34,0.2)" }}
+                    >
+                      {entry.name.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase()}
+                    </div>
+
+                    <div className="font-semibold text-white text-sm leading-tight">{entry.name}</div>
+
+                    <div className="text-lg font-black" style={{ color: "#FF5722" }}>{entry.score} pts</div>
+
+                    <div className="flex gap-3 text-xs" style={{ color: "rgba(232,234,246,0.45)" }}>
+                      <span className="flex items-center gap-1"><BookOpen size={10} />{entry.nominations}</span>
+                      {entry.wins > 0 && (
+                        <span className="flex items-center gap-1" style={{ color: "#FFD700" }}><Star size={10} />{entry.wins}</span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* ══ CTA ══════════════════════════════════════════════ */}
       <section
         className="py-20"
@@ -539,7 +605,7 @@ export default function Home() {
             </p>
             <div className="flex flex-wrap gap-4 justify-center relative">
               <Link
-                href="/cycle"
+                href={`/join${activeCycle ? `?cycle=${activeCycle.id}` : ""}`}
                 className="btn-orange text-white font-bold px-8 py-3.5 rounded-full text-sm inline-flex items-center gap-2"
               >
                 Join This Cycle <ArrowRight size={14} />

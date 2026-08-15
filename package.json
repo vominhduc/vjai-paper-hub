@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "jest"
+    "test": "jest",
+    "bootstrap-archive": "node scripts/bootstrap-archive.js"
   },
   "dependencies": {
     "date-fns": "^4.1.0",

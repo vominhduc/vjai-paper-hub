@@ -1,0 +1,14 @@
+[
+  {
+    "name": "Duc Vo",
+    "sessions": ["2026-mar", "2026-apr", "2026-may"]
+  },
+  {
+    "name": "Lan Nguyen",
+    "sessions": ["2026-mar", "2026-apr"]
+  },
+  {
+    "name": "Minh Tran",
+    "sessions": ["2026-mar"]
+  }
+]

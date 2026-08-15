@@ -10,6 +10,7 @@ const navLinks = [
   { label: "Cycle", href: "/cycle" },
   { label: "Seeds", href: "/seeds" },
   { label: "Archive", href: "/archive" },
+  { label: "Leaderboard", href: "/leaderboard" },
   { label: "Guide", href: "/guide" },
 ];
 
@@ -76,10 +77,10 @@ export default function Navbar() {
         {/* CTA */}
         <div className="hidden md:flex items-center gap-3">
           <Link
-            href="/cycle"
+            href="/join"
             className="btn-orange text-white font-semibold text-sm px-5 py-2 rounded-full"
           >
-            Join Next Session
+            Register for Session
           </Link>
         </div>
 
@@ -131,10 +132,10 @@ export default function Navbar() {
             </Link>
           ))}
           <Link
-            href="/cycle"
+            href="/join"
             className="btn-orange text-white font-semibold text-sm px-5 py-3 rounded-full text-center mt-2"
           >
-            Join Next Session
+            Register for Session
           </Link>
         </div>
       )}

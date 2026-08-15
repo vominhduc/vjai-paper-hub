@@ -1,1 +1,60 @@
-[]
+[
+  {
+    "id": "attention-is-all-you-need",
+    "title": "Attention Is All You Need",
+    "conference": "NeurIPS",
+    "year": 2017,
+    "status": "Reproduced",
+    "presenter": "Duc Vo",
+    "tags": [
+      "Transformers",
+      "NLP",
+      "Foundations"
+    ],
+    "date_read": "2026-03-15",
+    "vibeScore": 85,
+    "resources": {
+      "arxiv": "https://arxiv.org/abs/1706.03762",
+      "github": "",
+      "vjai_code": "",
+      "youtube": "",
+      "blog": ""
+    },
+    "summary": "The paper that introduced the Transformer architecture — replacing recurrence and convolutions with a pure attention mechanism. It became the foundation for BERT, GPT, and virtually every modern LLM.",
+    "tldr": [
+      "Self-attention replaces recurrence, enabling full parallelization during training",
+      "Multi-head attention lets the model jointly attend to information from different representation subspaces",
+      "Positional encodings inject sequence order without recurrent structure",
+      "Achieved SOTA on WMT 2014 EN-DE translation with far less compute than previous models"
+    ]
+  },
+  {
+    "id": "deepseek-r1",
+    "title": "DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning",
+    "conference": "arXiv",
+    "year": 2025,
+    "status": "Reproduced",
+    "presenter": "Duc Vo",
+    "tags": [
+      "LLM",
+      "RL",
+      "Reasoning"
+    ],
+    "date_read": "2026-04-12",
+    "vibeScore": 78,
+    "resources": {
+      "arxiv": "https://arxiv.org/abs/2501.12948",
+      "github": "",
+      "vjai_code": "",
+      "youtube": "",
+      "blog": ""
+    },
+    "summary": "DeepSeek-R1 demonstrates that pure reinforcement learning (GRPO) can produce emergent chain-of-thought reasoning in LLMs without supervised fine-tuning warm-up. It matches OpenAI o1 on several reasoning benchmarks at a fraction of the cost.",
+    "tldr": [
+      "Pure RL with a simple accuracy + format reward produces emergent reasoning without any SFT warm-up",
+      "GRPO (Group Relative Policy Optimization) stabilizes training without a value network",
+      "R1-Zero shows self-reflection and multi-step reasoning emerging spontaneously from RL",
+      "Distilled 7B/8B models are competitive with o1-mini on MATH-500 and LiveCodeBench"
+    ]
+  }
+]

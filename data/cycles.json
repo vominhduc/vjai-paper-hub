@@ -32,7 +32,7 @@
           "Vision-language model",
           "Joint Embedding Predictive Architecture"
         ],
-        "is_selected": false,
+        "is_selected": true,
         "votes": 1,
         "issue_number": 7
       },

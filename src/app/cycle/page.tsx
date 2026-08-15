@@ -194,7 +194,8 @@ function NominationCard({
 
 /* ─── Deep Dive Spotlight ─────────────────────────────────── */
 function DeepDiveSpotlight({ cycle }: { cycle: Cycle }) {
-  const selected = cycle.nominations.find((n) => n.is_selected);
+  const selectedPapers = cycle.nominations.filter((n) => n.is_selected);
+  const selected = selectedPapers[0]; // primary (highest votes)
 
   return (
     <div className="grid lg:grid-cols-5 gap-8">
@@ -223,25 +224,28 @@ function DeepDiveSpotlight({ cycle }: { cycle: Cycle }) {
           </span>
         </div>
 
-        {selected && (
+        {selectedPapers.length > 0 && (
           <>
-            <div className="flex flex-wrap gap-2 mb-4">
-              {selected.tags.map((t) => (
-                <span key={t} className="paper-tag text-xs px-3 py-1 rounded-full font-bold">
-                  {t}
-                </span>
-              ))}
-            </div>
-
-            <h2 className="text-2xl font-black text-white leading-tight mb-3">
-              {selected.title}
-            </h2>
-
-            <p className="text-sm mb-6" style={{ color: "rgba(232,234,246,0.55)" }}>
-              Selected by community vote — {selected.votes} votes
-            </p>
-
-            <div className="glow-line mb-6" />
+            {selectedPapers.map((paper, i) => (
+              <div key={paper.id} className={i > 0 ? "mt-5 pt-5 border-t border-white/10" : ""}>
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {paper.tags.map((t) => (
+                    <span key={t} className="paper-tag text-xs px-3 py-1 rounded-full font-bold">{t}</span>
+                  ))}
+                </div>
+                <h2 className="text-xl font-black text-white leading-tight mb-1">{paper.title}</h2>
+                <p className="text-sm mb-2" style={{ color: "rgba(232,234,246,0.55)" }}>
+                  Proposed by <span style={{ color: "#FF7043" }}>{paper.proposer}</span> · {paper.votes} votes
+                </p>
+                {(paper.arxiv || paper.paper_url) && (
+                  <a href={paper.arxiv || paper.paper_url} target="_blank" rel="noopener noreferrer"
+                    className="text-xs font-semibold" style={{ color: "#FF5722" }}>
+                    View Paper →
+                  </a>
+                )}
+              </div>
+            ))}
+            <div className="glow-line mt-5 mb-6" />
           </>
         )}
 
@@ -278,23 +282,17 @@ function DeepDiveSpotlight({ cycle }: { cycle: Cycle }) {
 
         <div className="flex gap-3">
           {(selected?.arxiv || selected?.paper_url) && (
-            <a
-              href={selected.arxiv || selected.paper_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-orange flex-1 text-center text-white font-bold text-sm py-3 rounded-xl"
-            >
+            <a href={selected.arxiv || selected.paper_url} target="_blank" rel="noopener noreferrer"
+              className="btn-orange flex-1 text-center text-white font-bold text-sm py-3 rounded-xl">
               Read Paper
             </a>
           )}
-          <a
-            href="https://github.com/vominhduc/vjai-paper-hub/discussions"
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            href={`/join?cycle=${cycle.id}`}
             className="btn-ghost flex-1 text-center text-white font-semibold text-sm py-3 rounded-xl"
           >
-            Join Session
-          </a>
+            Register for Session
+          </Link>
         </div>
       </div>
 
@@ -724,6 +722,15 @@ function CyclePageInner() {
                     : "TBD"}
                 </strong>
               </span>
+              {cycle.status === "active" && (
+                <Link
+                  href={`/join?cycle=${cycle.id}`}
+                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold text-white transition-opacity hover:opacity-80"
+                  style={{ background: "linear-gradient(135deg, #FF5722, #FF8A65)" }}
+                >
+                  <Users size={11} /> Register
+                </Link>
+              )}
             </div>
           </div>
         </div>

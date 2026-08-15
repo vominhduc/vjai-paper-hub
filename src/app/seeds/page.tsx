@@ -263,7 +263,8 @@ function CycleSection({
     })
     .sort((a, b) => sortBy === "votes" ? b.votes - a.votes : 0);
 
-  const selectedNom = cycle.nominations.find((n) => n.is_selected);
+  const selectedNoms = cycle.nominations.filter((n) => n.is_selected);
+  const selectedNom = selectedNoms[0]; // used for display where only one is needed
 
   return (
     <div className="mb-16">
