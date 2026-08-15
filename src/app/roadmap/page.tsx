@@ -52,7 +52,7 @@ export default function RoadmapPage() {
             {cycles.map((cycle) => {
               const phase = getCyclePhase(cycle);
               const isActive = cycle.status === "active";
-              const isArchived = phase === "archived";
+              const isArchived = cycle.status === "archived" || phase === "archived";
 
               const phaseLabel = isArchived
                 ? { icon: <CheckCircle2 size={12} />, text: "Completed", color: "#4CAF50", bg: "rgba(76,175,80,0.1)", border: "rgba(76,175,80,0.25)" }
