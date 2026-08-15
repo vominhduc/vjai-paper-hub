@@ -36,7 +36,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 /* ─── Page ────────────────────────────────────────────────── */
 export default function Home() {
-  const deepDiveCycle = cycles.find((c) => getCyclePhase(c) === "deep-dive");
+  const deepDiveCycle = cycles.find((c) => c.status === "active" && getCyclePhase(c) === "deep-dive");
   // A second concurrent cycle (nominating/voting) can exist alongside a deep-dive.
   // Must filter to status === "active" — planned cycles with no dates also return "nominating".
   const nextActiveCycle =
