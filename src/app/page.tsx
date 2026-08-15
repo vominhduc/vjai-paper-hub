@@ -42,7 +42,7 @@ export default function Home() {
   const nextActiveCycle =
     cycles.find((c) => c !== deepDiveCycle && c.status === "active" && getCyclePhase(c) === "voting") ??
     cycles.find((c) => c !== deepDiveCycle && c.status === "active" && getCyclePhase(c) === "nominating");
-  const activeCycle = deepDiveCycle ?? nextActiveCycle ?? cycles[0];
+  const activeCycle = deepDiveCycle ?? nextActiveCycle ?? cycles.find((c) => c.status === "active" && getCyclePhase(c) !== "archived") ?? cycles[0];
   const phase = activeCycle ? getCyclePhase(activeCycle) : "nominating";
   const selected = deepDiveCycle?.nominations.find((n) => n.is_selected && n.votes === Math.max(...(deepDiveCycle?.nominations.filter(n2 => n2.is_selected).map(n2 => n2.votes) ?? [0])));
   const recentPapers = archive.slice(0, 3);

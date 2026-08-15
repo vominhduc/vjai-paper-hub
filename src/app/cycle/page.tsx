@@ -544,7 +544,7 @@ function CyclePageInner() {
 
   // Default to the active/nominating cycle, then voting, then first
   const defaultCycleId = (
-    cycles.find((c) => c.status === "active") ??
+    cycles.find((c) => c.status === "active" && getCyclePhase(c) !== "archived") ??
     cycles.find((c) => getCyclePhase(c) === "nominating") ??
     cycles.find((c) => getCyclePhase(c) === "voting") ??
     cycles[0]
