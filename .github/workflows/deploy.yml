@@ -46,6 +46,7 @@ jobs:
         run: npm run build
         env:
           NODE_ENV: production
+          NEXT_PUBLIC_JOIN_WEBHOOK_URL: ${{ secrets.NEXT_PUBLIC_JOIN_WEBHOOK_URL }}
 
       # GitHub Pages requires a .nojekyll file to serve _next/ assets correctly
       - name: Add .nojekyll
