@@ -137,5 +137,23 @@
       "presenter_role": "VJAI Community",
       "agenda": []
     }
+  },
+  {
+    "id": "2026-nov",
+    "month": "November",
+    "year": 2026,
+    "theme": "all AI conference in 2026",
+    "status": "active",
+    "nomination_end": "",
+    "exploration_start": "",
+    "session_date": "",
+    "nominations": [],
+    "session": {
+      "date": "",
+      "location": "TBD",
+      "presenter": "TBD",
+      "presenter_role": "VJAI Community",
+      "agenda": []
+    }
   }
 ]
